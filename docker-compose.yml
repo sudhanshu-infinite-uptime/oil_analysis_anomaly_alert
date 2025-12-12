@@ -1,0 +1,205 @@
+services:
+  # ---------------------------------------------------------
+  # 🧠 Flink JobManager
+  # ---------------------------------------------------------
+  jobmanager:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: flink-jobmanager
+    command: ["jobmanager"]
+
+    ports:
+      - "8081:8081"
+
+    environment:
+      PYTHONPATH: "/opt/flink/app:/opt/flink"
+
+      # Kafka config
+      KAFKA_ENDPOINTS: 13.201.119.174:9192, 13.201.28.227:9192, 13.127.64.142:9192
+      INPUT_TOPIC: "iu_external_device_data_v1"
+      ALERT_TOPIC: "oil-analysis-anomaly-alert"
+      TREND_API_BASE_URL: "http://host.docker.internal:5000/api/v1/trend"
+
+      AWS_ACCESS_KEY: ${AWS_ACCESS_KEY}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+      S3_BUCKET_NAME: ${S3_BUCKET_NAME}
+
+
+      # Flink config (NO config.yaml needed)
+      JOB_MANAGER_RPC_ADDRESS: jobmanager
+      TASK_MANAGER_SLOTS: 2
+      PARALLELISM: 1
+
+    volumes:
+      - ./app:/opt/flink/app:ro
+      - ./models:/opt/flink/models
+      - flink_logs:/opt/flink/logs
+
+    networks:
+      - flink_kafka_net
+
+    restart: always
+
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8081/overview"]
+      interval: 10s
+      retries: 20
+      start_period: 40s
+
+  # ---------------------------------------------------------
+  # ⚙️ Flink TaskManager
+  # ---------------------------------------------------------
+  taskmanager:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: flink-taskmanager
+    command: ["taskmanager"]
+
+    depends_on:
+      jobmanager:
+        condition: service_healthy
+
+    environment:
+      PYTHONPATH: "/opt/flink/app:/opt/flink"
+      KAFKA_ENDPOINTS: 13.201.119.174:9192, 13.201.28.227:9192, 13.127.64.142:9192
+      INPUT_TOPIC: "iu_external_device_data_v1"
+      ALERT_TOPIC: "oil-analysis-anomaly-alert"
+      TREND_API_BASE_URL: "http://host.docker.internal:5000/api/v1/trend"
+
+      AWS_ACCESS_KEY: ${AWS_ACCESS_KEY}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+      S3_BUCKET_NAME: ${S3_BUCKET_NAME}
+
+
+      JOB_MANAGER_RPC_ADDRESS: jobmanager
+      TASK_MANAGER_SLOTS: 2
+      PARALLELISM: 1
+
+    volumes:
+      - ./app:/opt/flink/app:ro
+      - ./models:/opt/flink/models
+      - flink_logs:/opt/flink/logs
+
+    networks:
+      - flink_kafka_net
+
+    restart: always
+
+    healthcheck:
+      test: ["CMD", "nc", "-z", "jobmanager", "6123"]
+      interval: 10s
+      retries: 20
+      start_period: 30s
+
+  # ---------------------------------------------------------
+  # 🔊 Kafka Broker
+  # ---------------------------------------------------------
+  kafka:
+    image: confluentinc/cp-kafka:7.5.1
+    container_name: kafka
+
+    ports:
+      - "9092:9092"
+      - "29092:29092"
+
+    environment:
+      CLUSTER_ID: "MkU3OEVBNTcwNTJENDM2Qk"
+      KAFKA_PROCESS_ROLES: "broker,controller"
+      KAFKA_NODE_ID: "1"
+      KAFKA_CONTROLLER_QUORUM_VOTERS: "1@kafka:9093"
+      KAFKA_CONTROLLER_LISTENER_NAMES: "CONTROLLER"
+
+      KAFKA_LISTENERS: "PLAINTEXT://kafka:9092,PLAINTEXT_HOST://0.0.0.0:29092,CONTROLLER://0.0.0.0:9093"
+      KAFKA_ADVERTISED_LISTENERS: "PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092"
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: "CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT"
+
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+      KAFKA_ALLOW_AUTO_CREATE_TOPICS: "true"
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: "1"
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: "1"
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: "1"
+
+    volumes:
+      - kafka_data:/var/lib/kafka/data
+
+    networks:
+      - flink_kafka_net
+
+    restart: always
+
+    healthcheck:
+      test: ["CMD", "nc", "-z", "kafka", "9092"]
+      interval: 5s
+      retries: 10
+      start_period: 20s
+
+  # ---------------------------------------------------------
+  # 🔍 Kafdrop UI (Kafka Viewer)
+  # ---------------------------------------------------------
+  kafdrop:
+    image: obsidiandynamics/kafdrop
+    container_name: kafdrop
+
+    ports:
+      - "9000:9000"
+    environment:
+      KAFKA_BROKERCONNECT: "kafka:9092"
+
+    depends_on:
+      kafka:
+        condition: service_healthy
+
+    networks:
+      - flink_kafka_net
+
+    restart: "no"
+
+  # ---------------------------------------------------------
+  # 🚀 Auto-submit Flink Job once cluster is ready
+  # ---------------------------------------------------------
+  flink-submit:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: flink-submit
+
+    depends_on:
+      jobmanager:
+        condition: service_healthy
+      taskmanager:
+        condition: service_healthy
+
+    command: >
+      bash -c "
+        echo 'Waiting for cluster...' &&
+        sleep 5 &&
+        flink run -py /opt/flink/app/main.py
+          --jarfile /opt/flink/lib/flink-connector-kafka-3.2.0-1.19.jar
+      "
+    environment:
+      AWS_ACCESS_KEY: ${AWS_ACCESS_KEY}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+      S3_BUCKET_NAME: ${S3_BUCKET_NAME}
+
+    volumes:
+      - ./app:/opt/flink/app
+      - ./models:/opt/flink/models
+
+    networks:
+      - flink_kafka_net
+
+    restart: "no"
+
+
+# ---------------------------------------------------------
+# Networks & Volumes
+# ---------------------------------------------------------
+networks:
+  flink_kafka_net:
+    driver: bridge
+
+volumes:
+  kafka_data:
+  flink_logs:
