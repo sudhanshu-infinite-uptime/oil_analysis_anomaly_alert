@@ -1,0 +1,14 @@
+{
+  "monitor_id": "30",
+  "feature_names": [
+    "001_A",
+    "001_B",
+    "001_C",
+    "001_D",
+    "001_E",
+    "001_F"
+  ],
+  "trained_at": "2025-12-11T05:39:42.983226",
+  "trained_from": "WINDOW",
+  "window_size": 10
+}
