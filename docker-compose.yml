@@ -17,8 +17,8 @@ services:
 
       # Kafka config
       KAFKA_ENDPOINTS: 13.201.119.174:9192, 13.201.28.227:9192, 13.127.64.142:9192
-      INPUT_TOPIC: "iu_external_device_data_v1"
-      ALERT_TOPIC: "oil-analysis-anomaly-alert"
+      INPUT_TOPIC: ${INPUT_TOPIC}
+      ALERT_TOPIC: ${ALERT_TOPIC}
       TREND_API_BASE_URL: "http://host.docker.internal:5000/api/v1/trend"
 
       AWS_ACCESS_KEY: ${AWS_ACCESS_KEY}
@@ -64,8 +64,8 @@ services:
     environment:
       PYTHONPATH: "/opt/flink/app:/opt/flink"
       KAFKA_ENDPOINTS: 13.201.119.174:9192, 13.201.28.227:9192, 13.127.64.142:9192
-      INPUT_TOPIC: "iu_external_device_data_v1"
-      ALERT_TOPIC: "oil-analysis-anomaly-alert"
+      INPUT_TOPIC: ${INPUT_TOPIC}
+      ALERT_TOPIC: ${ALERT_TOPIC}
       TREND_API_BASE_URL: "http://host.docker.internal:5000/api/v1/trend"
 
       AWS_ACCESS_KEY: ${AWS_ACCESS_KEY}
