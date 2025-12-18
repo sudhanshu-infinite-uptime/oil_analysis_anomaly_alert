@@ -48,6 +48,8 @@ def build_flink_job():
     env = StreamExecutionEnvironment.get_execution_environment()
     env.set_parallelism(CONFIG.FLINK_PARALLELISM)
 
+    logger.info(f"Kafka bootstrap.servers = {CONFIG.KAFKA_BROKERS}")
+
     # --------------------------------------------------------------
     # Kafka Consumer
     # --------------------------------------------------------------

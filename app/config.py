@@ -14,6 +14,7 @@ Responsibilities:
 Usage:
     from app.config import CONFIG
 """
+
 from __future__ import annotations
 
 import os
@@ -37,7 +38,9 @@ def _env_int(key: str, default: int) -> int:
     try:
         return int(val)
     except ValueError:
-        raise ValueError(f"Environment variable {key} must be an integer (got: {val!r})")
+        raise ValueError(
+            f"Environment variable {key} must be an integer (got: {val!r})"
+        )
 
 
 def _env_float(key: str, default: float) -> float:
@@ -47,7 +50,9 @@ def _env_float(key: str, default: float) -> float:
     try:
         return float(val)
     except ValueError:
-        raise ValueError(f"Environment variable {key} must be a float (got: {val!r})")
+        raise ValueError(
+            f"Environment variable {key} must be a float (got: {val!r})"
+        )
 
 
 def _env_bool(key: str, default: bool) -> bool:
@@ -100,8 +105,12 @@ FEATURE_MAP = {
     "001_R": "Total Non-Ferrous Particles",
 }
 
-MODEL_FEATURE_CODES = ["001_A", "001_B", "001_C", "001_D", "001_E", "001_F"]
+# Raw sensor codes used for ML
+MODEL_FEATURE_CODES = [
+    "001_A", "001_B", "001_C", "001_D", "001_E", "001_F"
+]
 
+# Canonical ML feature order (training + inference)
 FEATURES = [
     "Dielectric Constant",
     "Oil Density",
@@ -117,14 +126,20 @@ FEATURES = [
 # -------------------------------------------------------------------
 @dataclass(frozen=True)
 class Config:
-    """Typed configuration object used throughout the pipeline."""
+    """
+    Typed configuration object used throughout the pipeline.
+    All runtime code must read configuration only from this object.
+    """
 
     # Kafka topics
     INPUT_TOPIC: str
     ALERT_TOPIC: str
 
-    # Kafka brokers
+    # Kafka brokers (list form)
     BROKERS: List[str]
+
+    # Kafka brokers (string form – REQUIRED by Flink Kafka connector)
+    KAFKA_BROKERS: str
 
     # Model storage & caching
     MODEL_BASE_PATH: Path
@@ -146,7 +161,6 @@ class Config:
 
     # Static defaults (not env-driven)
     FLINK_PARALLELISM: int = 1
-    KAFKA_BROKERS: str = "kafka:9092"
     KAFKA_GROUP: str = "oil-anomaly-consumer-group"
 
     # Model hyperparameters
@@ -157,15 +171,22 @@ class Config:
     S3_BUCKET_NAME: str = ""
 
 
-
 # -------------------------------------------------------------------
 # Create global CONFIG
 # -------------------------------------------------------------------
+
+# Read Kafka brokers ONCE and reuse everywhere
+_BROKER_LIST = _env_list("KAFKA_ENDPOINTS", ["kafka:9092"])
+
 CONFIG = Config(
     INPUT_TOPIC=_env_str("INPUT_TOPIC", "iu_external_device_data_v1"),
     ALERT_TOPIC=_env_str("ALERT_TOPIC", "oil-analysis-anomaly-alert"),
 
-    BROKERS=_env_list("KAFKA_ENDPOINTS", ["localhost:9092"]),
+    # Keep list form (useful for future extensions)
+    BROKERS=_BROKER_LIST,
+
+    # String form (USED by Flink Kafka producer/consumer)
+    KAFKA_BROKERS=",".join(_BROKER_LIST),
 
     MODEL_BASE_PATH=DEFAULT_MODEL_BASE_PATH,
     MODEL_CACHE_SIZE=_env_int("MODEL_CACHE_SIZE", 32),
@@ -176,10 +197,14 @@ CONFIG = Config(
     LOG_DIR=DEFAULT_LOG_DIR,
     DEBUG=_env_bool("DEBUG", False),
 
-    TREND_API_BASE_URL=_env_str("TREND_API_BASE_URL", "http://localhost:5000/api/v1/trend"),
+    TREND_API_BASE_URL=_env_str(
+        "TREND_API_BASE_URL",
+        "http://localhost:5000/api/v1/trend"
+    ),
+
     TRAINING_CONTAMINATION=_env_float("TRAINING_CONTAMINATION", 0.05),
 
-    S3_BUCKET_NAME = _env_str("S3_BUCKET_NAME", "")
+    S3_BUCKET_NAME=_env_str("S3_BUCKET_NAME", "")
 )
 
 
