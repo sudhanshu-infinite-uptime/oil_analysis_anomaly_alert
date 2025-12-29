@@ -1,13 +1,18 @@
 """
 send_test_message.py
-Sends synthetic sensor messages for MANY MONITORIDs.
 
-Flink will:
-  - detect MONITORID
-  - check if model exists
-  - auto-train using model_builder.py
-  - run anomaly detection
-  - publish alerts to oil-analysis-anomaly-alert
+Sends synthetic sensor messages to Kafka for multiple MONITORIDs.
+
+Designed for:
+    • Local testing
+    • Docker execution
+    • UAT / PROD environments
+
+Flink behavior:
+    - Detect MONITORID
+    - Auto-create or load model
+    - Run anomaly detection
+    - Publish alerts to ALERT_TOPIC
 """
 
 from kafka import KafkaProducer
@@ -16,49 +21,76 @@ import time
 import numpy as np
 import random
 import logging
+import os
+import sys
 
-# ------------------------------------------------------
-# CONFIG  (fixed for now)
-# ------------------------------------------------------
-TOPIC = "iu_external_device_data_v1"
-BROKER = "172.18.0.2:9092"    # <-- Kafka IP
 
-# Multiple monitors → models should auto-create
-MONITOR_IDS = [29, 30, 31, 32, 33]
-
+# ------------------------------------------------------------------
+# Logging
+# ------------------------------------------------------------------
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s | %(levelname)s | %(message)s"
 )
+logger = logging.getLogger(__name__)
 
-# ------------------------------------------------------
-# CONNECT TO KAFKA
-# ------------------------------------------------------
-try:
-    producer = KafkaProducer(
-        bootstrap_servers=[BROKER],
-        value_serializer=lambda v: dumps(v).encode("utf-8"),
-        linger_ms=5,
-        retries=5
+
+# ------------------------------------------------------------------
+# Environment-driven configuration
+# ------------------------------------------------------------------
+TOPIC = os.getenv("INPUT_TOPIC", "iu_external_device_data_v1")
+
+BROKERS_ENV = (
+    os.getenv("KAFKA_ENDPOINTS")
+    or os.getenv("KAFKA_BROKERS")
+    or "kafka:9092"   # Docker default
+)
+
+BROKERS = [b.strip() for b in BROKERS_ENV.split(",") if b.strip()]
+
+if not BROKERS:
+    raise RuntimeError(
+        "Kafka brokers not configured. "
+        "Set KAFKA_ENDPOINTS or KAFKA_BROKERS."
     )
-    logging.info(f"🚀 Connected to Kafka @ {BROKER}")
-except Exception as e:
-    logging.error(f"❌ Kafka connection error: {e}")
-    raise SystemExit(1)
 
-# ------------------------------------------------------
-# MODEL FEATURE CODES
-# ------------------------------------------------------
+logger.info(f"Kafka brokers resolved to: {BROKERS}")
+logger.info(f"Kafka topic: {TOPIC}")
+
+
+# ------------------------------------------------------------------
+# Test data configuration
+# ------------------------------------------------------------------
+MONITOR_IDS = [29, 30, 31, 32, 33]
+TOTAL_MESSAGES = 10000
+SLEEP_SECONDS = 1
+
 MODEL_FEATURE_CODES = [f"001_{chr(65+i)}" for i in range(6)]  # A–F
 
 
-# ------------------------------------------------------
-# SEND TEST MESSAGES
-# ------------------------------------------------------
-for i in range(10000):   # send 50 messages
+# ------------------------------------------------------------------
+# Kafka Producer
+# ------------------------------------------------------------------
+try:
+    producer = KafkaProducer(
+        bootstrap_servers=BROKERS,
+        value_serializer=lambda v: dumps(v).encode("utf-8"),
+        linger_ms=5,
+        retries=5,
+        request_timeout_ms=10000
+    )
+    logger.info("🚀 Kafka producer initialized successfully")
+except Exception as exc:
+    logger.error(f"❌ Failed to initialize Kafka producer: {exc}")
+    sys.exit(1)
+
+
+# ------------------------------------------------------------------
+# Send messages
+# ------------------------------------------------------------------
+for i in range(TOTAL_MESSAGES):
     monitor_id = random.choice(MONITOR_IDS)
 
-    # Full 18 features (A–R)
     params = {
         "001_A": float(np.random.normal(50.00, 0.2)),
         "001_B": float(np.random.normal(0.889, 0.002)),
@@ -82,12 +114,14 @@ for i in range(10000):   # send 50 messages
         "001_R": float(np.random.uniform(0, 10)),
     }
 
-    # Random anomaly injection
+    # Inject anomalies periodically
     if i % 7 == 0:
         anomaly_keys = random.sample(MODEL_FEATURE_CODES, k=2)
         for key in anomaly_keys:
             params[key] *= random.uniform(4, 8)
-        logging.warning(f"⚠️ Injected anomaly for MONITORID={monitor_id} in {anomaly_keys}")
+        logger.warning(
+            f"⚠️ Injected anomaly | MONITORID={monitor_id} | fields={anomaly_keys}"
+        )
 
     message = {
         "MONITORID": monitor_id,
@@ -98,11 +132,13 @@ for i in range(10000):   # send 50 messages
 
     try:
         producer.send(TOPIC, value=message)
-        logging.info(f"📤 Sent message #{i+1} → MONITORID={monitor_id}")
-    except Exception as e:
-        logging.error(f"❌ Failed to send message {i+1}: {e}")
+        logger.info(f"📤 Sent message {i + 1}/{TOTAL_MESSAGES} | MONITORID={monitor_id}")
+    except Exception as exc:
+        logger.error(f"❌ Failed to send message {i + 1}: {exc}")
 
-    time.sleep(1)
+    time.sleep(SLEEP_SECONDS)
+
 
 producer.flush()
-logging.info("🏁 Finished sending messages!")
+producer.close()
+logger.info("🏁 Finished sending test messages")

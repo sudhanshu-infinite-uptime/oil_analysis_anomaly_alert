@@ -48,7 +48,14 @@ def build_flink_job():
     env = StreamExecutionEnvironment.get_execution_environment()
     env.set_parallelism(CONFIG.FLINK_PARALLELISM)
 
-    logger.info(f"Kafka bootstrap.servers = {CONFIG.KAFKA_BROKERS}")
+    logger.info("======================================")
+    logger.info("Submitting Flink job")
+    logger.info("Job Name          : Oil Anomaly Detection Pipeline")
+    logger.info(f"Kafka Input Topic : {CONFIG.INPUT_TOPIC}")
+    logger.info(f"Kafka Output Topic: {CONFIG.ALERT_TOPIC}")
+    logger.info(f"Kafka Brokers     : {CONFIG.BROKERS}")
+    logger.info("======================================")
+
 
     # --------------------------------------------------------------
     # Kafka Consumer

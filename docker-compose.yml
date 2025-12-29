@@ -16,12 +16,12 @@ services:
       PYTHONPATH: "/opt/flink/app:/opt/flink"
 
       # Kafka config
-      KAFKA_ENDPOINTS: 10.0.1.203:9092,10.0.1.202:9092,10.0.1.51:9092
+      KAFKA_ENDPOINTS: ${KAFKA_ENDPOINTS}
       INPUT_TOPIC: ${INPUT_TOPIC}
       ALERT_TOPIC: ${ALERT_TOPIC}
-      TREND_API_BASE_URL: "http://host.docker.internal:5000/api/v1/trend"
+      TREND_API_BASE_URL: ${TREND_API_BASE_URL}
 
-      AWS_ACCESS_KEY: ${AWS_ACCESS_KEY}
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
       AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
       S3_BUCKET_NAME: ${S3_BUCKET_NAME}
 
@@ -63,12 +63,12 @@ services:
 
     environment:
       PYTHONPATH: "/opt/flink/app:/opt/flink"
-      KAFKA_ENDPOINTS: 10.0.1.203:9092,10.0.1.202:9092,10.0.1.51:9092
+      KAFKA_ENDPOINTS: ${KAFKA_ENDPOINTS}
       INPUT_TOPIC: ${INPUT_TOPIC}
       ALERT_TOPIC: ${ALERT_TOPIC}
-      TREND_API_BASE_URL: "http://host.docker.internal:5000/api/v1/trend"
+      TREND_API_BASE_URL: ${TREND_API_BASE_URL}
 
-      AWS_ACCESS_KEY: ${AWS_ACCESS_KEY}
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
       AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
       S3_BUCKET_NAME: ${S3_BUCKET_NAME}
 
@@ -179,10 +179,10 @@ services:
           --jarfile /opt/flink/lib/flink-connector-kafka-3.2.0-1.19.jar
       "
     environment:
-      KAFKA_ENDPOINTS: 10.0.1.203:9092,10.0.1.202:9092,10.0.1.51:9092
+      KAFKA_ENDPOINTS: ${KAFKA_ENDPOINTS}
       INPUT_TOPIC: ${INPUT_TOPIC}
       ALERT_TOPIC: ${ALERT_TOPIC}
-      AWS_ACCESS_KEY: ${AWS_ACCESS_KEY}
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
       AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
       S3_BUCKET_NAME: ${S3_BUCKET_NAME}
 
