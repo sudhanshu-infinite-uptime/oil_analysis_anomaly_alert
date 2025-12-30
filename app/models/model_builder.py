@@ -4,14 +4,20 @@ app/models/model_builder.py
 Handles end-to-end model training for a specific MONITORID.
 
 Responsibilities:
-- Fetch historical data via TrendAPIClient
-- Build feature DataFrame
-- Train IsolationForest + RobustScaler
-- Persist model, scaler, metadata to S3
+- Fetch historical data using TrendAPIClient
+- Build training DataFrame from PROCESS_PARAMETER payload
+- Train IsolationForest with RobustScaler
+- Persist model artifacts and metadata
+
+Design principles:
+- Never crash Flink streaming jobs
+- Fail gracefully on external dependencies
+- Log every failure with context
+- Skip training instead of poisoning the pipeline
 
 This module does NOT:
 - Perform anomaly detection
-- Handle Kafka or Flink logic
+- Handle Kafka or Flink execution logic
 """
 
 from __future__ import annotations
@@ -25,12 +31,8 @@ from sklearn.ensemble import IsolationForest
 from sklearn.preprocessing import RobustScaler
 
 from app.api.trend_api_client import TrendAPIClient
-from app.models.model_store import (
-    save_binary,
-    save_metadata,
-)
+from app.models.model_store import save_binary, save_metadata
 from app.utils.logging_utils import get_logger
-from app.utils.exceptions import TrainingFailedError
 from app.config import CONFIG
 
 logger = get_logger(__name__)
@@ -40,21 +42,29 @@ def build_model_for_monitor(
     monitor_id: str,
     df: Optional[pd.DataFrame] = None,
     months: int = 3,
-):
+) -> None:
     """
-    Build and persist a model for a given MONITORID.
+    Train and persist a model for a given MONITORID.
+
+    This function is Flink-safe:
+    - It never raises exceptions outward
+    - Any failure results in a logged error and graceful return
 
     Args:
         monitor_id: Monitor identifier
-        df: Optional live data (ignored for now)
-        months: How much historical data to fetch
-
-    Raises:
-        TrainingFailedError on any failure
+        df: Optional live dataframe (currently unused)
+        months: Number of months of historical data to fetch
     """
 
-    logger.info(f"Starting model training | MONITORID={monitor_id}")
+    logger.info(
+        "Model training started | MONITORID=%s | months=%s",
+        monitor_id,
+        months,
+    )
 
+    # --------------------------------------------------
+    # Step 1: Fetch historical data
+    # --------------------------------------------------
     try:
         client = TrendAPIClient()
         records = client.get_history(
@@ -63,22 +73,42 @@ def build_model_for_monitor(
             access_token=CONFIG.TREND_API_TOKEN,
         )
     except Exception as exc:
-        raise TrainingFailedError(f"Trend API failure: {exc}")
+        logger.error(
+            "Trend API failure | MONITORID=%s | error=%s",
+            monitor_id,
+            exc,
+            exc_info=True,
+        )
+        return
 
-    try:
-        rows = []
-        for record in records:
-            params = record.get("PROCESS_PARAMETER") or record.get("processParameter")
-            if isinstance(params, dict):
-                rows.append(params)
+    # --------------------------------------------------
+    # Step 2: Extract PROCESS_PARAMETER payload
+    # --------------------------------------------------
+    rows = []
+    for record in records:
+        params = record.get("PROCESS_PARAMETER") or record.get("processParameter")
+        if isinstance(params, dict):
+            rows.append(params)
 
-        if not rows:
-            raise TrainingFailedError("No usable PROCESS_PARAMETER data")
+    if not rows:
+        logger.warning(
+            "No usable PROCESS_PARAMETER data | MONITORID=%s",
+            monitor_id,
+        )
+        return
 
-        train_df = pd.DataFrame(rows).dropna(axis=1, how="all")
-    except Exception as exc:
-        raise TrainingFailedError(f"Data preparation failed: {exc}")
+    train_df = pd.DataFrame(rows).dropna(axis=1, how="all")
 
+    if train_df.empty:
+        logger.warning(
+            "Training DataFrame empty after cleanup | MONITORID=%s",
+            monitor_id,
+        )
+        return
+
+    # --------------------------------------------------
+    # Step 3: Train model
+    # --------------------------------------------------
     try:
         scaler = RobustScaler()
         X_scaled = scaler.fit_transform(train_df)
@@ -91,7 +121,13 @@ def build_model_for_monitor(
         )
         model.fit(X_scaled)
     except Exception as exc:
-        raise TrainingFailedError(f"Model training failed: {exc}")
+        logger.error(
+            "Model training failed | MONITORID=%s | error=%s",
+            monitor_id,
+            exc,
+            exc_info=True,
+        )
+        return
 
     metadata = {
         "monitor_id": monitor_id,
@@ -101,6 +137,9 @@ def build_model_for_monitor(
         "algorithm": "IsolationForest",
     }
 
+    # --------------------------------------------------
+    # Step 4: Persist artifacts
+    # --------------------------------------------------
     try:
         save_binary(
             f"{monitor_id}/model.pkl",
@@ -112,6 +151,15 @@ def build_model_for_monitor(
         )
         save_metadata(monitor_id, metadata)
     except Exception as exc:
-        raise TrainingFailedError(f"S3 persistence failed: {exc}")
+        logger.error(
+            "Model persistence failed | MONITORID=%s | error=%s",
+            monitor_id,
+            exc,
+            exc_info=True,
+        )
+        return
 
-    logger.info(f"Model training completed | MONITORID={monitor_id}")
+    logger.info(
+        "Model training completed successfully | MONITORID=%s",
+        monitor_id,
+    )

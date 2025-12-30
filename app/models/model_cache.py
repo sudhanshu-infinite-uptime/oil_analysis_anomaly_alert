@@ -1,29 +1,31 @@
 """
 app/models/model_cache.py
 
-Provides an in-memory LRU (Least Recently Used) cache for storing model bundles
-used during inference. This avoids repeatedly loading large pickle files from
-disk in the Flink operator.
+In-memory LRU cache for storing trained model bundles used during inference.
 
-A cache entry contains:
-    - isolation forest model object
-    - robust scaler object
-    - metadata dictionary
+Each cache entry contains:
+- IsolationForest model
+- RobustScaler
+- metadata dictionary
+
+Purpose:
+- Avoid repeated S3 reads during Flink stream processing
+- Improve latency and throughput
+
+Notes:
+- Cache is per Python process (per TaskManager worker)
+- Thread-safe for concurrent operator access
 
 Used by:
-    - flink/operators.py → during anomaly detection
-    - anomaly_detector.py → to retrieve loaded model bundle
-
-This module does NOT:
-    - Load models from disk (delegates to model_loader)
-    - Train models
-    - Save files
+- flink/operators.py
+- anomaly_detector.py
 """
 
 from __future__ import annotations
 
 from collections import OrderedDict
 from typing import Any, Dict, Tuple
+from threading import Lock
 
 from app.config import CONFIG
 from app.models.model_loader import load_model_bundle
@@ -34,65 +36,68 @@ logger = get_logger(__name__)
 
 class ModelCache:
     """
-    Simple LRU cache for model bundles.
+    Thread-safe LRU cache for model bundles.
 
-    Behavior:
-        - get(monitor_id): returns (model, scaler, metadata)
-        - Loads from disk if not cached
-        - Stores entry in LRU order
-        - Evicts oldest entry when full
+    API:
+        get(monitor_id) -> (model, scaler, metadata)
+        clear() -> None
     """
 
-    def __init__(self, max_size: int = None):
+    def __init__(self, max_size: int | None = None):
         self.max_size = max_size or CONFIG.MODEL_CACHE_SIZE
         self.cache: OrderedDict[str, Tuple[Any, Any, Dict]] = OrderedDict()
+        self._lock = Lock()
 
-        logger.info(f"ModelCache initialized with max_size={self.max_size}")
+        logger.info(
+            "ModelCache initialized | max_size=%d | id=%s",
+            self.max_size,
+            hex(id(self)),
+        )
 
-    # -------------------------------------------------------------------
-    # Public method: retrieve model from cache or load from disk
-    # -------------------------------------------------------------------
+    # ------------------------------------------------------------------
+    # Retrieve model bundle (cache-first)
+    # ------------------------------------------------------------------
     def get(self, monitor_id: str) -> Tuple[Any, Any, Dict]:
         """
-        Retrieve a model bundle for MONITORID.
-        Load from disk if not cached.
+        Retrieve model bundle for MONITORID.
 
-        Args:
-            monitor_id: Monitor identifier string.
+        Loads from S3 if not present in cache.
 
-        Returns:
-            Tuple: (model_object, scaler_object, metadata_dict)
+        Raises:
+            ModelNotFoundError
+            ModelLoadError
         """
 
-        # -------------------------
-        # Cache hit
-        # -------------------------
-        if monitor_id in self.cache:
-            model_bundle = self.cache.pop(monitor_id)  # refresh LRU
-            self.cache[monitor_id] = model_bundle
-            logger.info(f"Cache hit → MONITORID={monitor_id}")
-            return model_bundle
+        with self._lock:
+            if monitor_id in self.cache:
+                bundle = self.cache.pop(monitor_id)
+                self.cache[monitor_id] = bundle
+                logger.debug("ModelCache HIT | MONITORID=%s", monitor_id)
+                return bundle
 
-        # -------------------------
-        # Cache miss → load from disk
-        # -------------------------
-        logger.info(f"Cache miss → loading model for MONITORID={monitor_id}")
-        model_bundle = load_model_bundle(monitor_id)
+        logger.info("ModelCache MISS | Loading model | MONITORID=%s", monitor_id)
 
-        # Insert into LRU cache
-        self.cache[monitor_id] = model_bundle
+        # Load outside lock (S3/network I/O)
+        bundle = load_model_bundle(monitor_id)
 
-        # Evict if over capacity
-        if len(self.cache) > self.max_size:
-            evicted_id, _ = self.cache.popitem(last=False)
-            logger.warning(f"LRU cache eviction → MONITORID={evicted_id}")
+        with self._lock:
+            self.cache[monitor_id] = bundle
 
-        return model_bundle
+            if len(self.cache) > self.max_size:
+                evicted_id, _ = self.cache.popitem(last=False)
+                logger.warning(
+                    "ModelCache EVICT | MONITORID=%s | cache_size=%d",
+                    evicted_id,
+                    len(self.cache),
+                )
 
-    # -------------------------------------------------------------------
-    # Optional: clear cache (useful for tests or manual restart)
-    # -------------------------------------------------------------------
+        return bundle
+
+    # ------------------------------------------------------------------
+    # Clear cache
+    # ------------------------------------------------------------------
     def clear(self) -> None:
-        """Remove all cached model entries."""
-        self.cache.clear()
-        logger.info("ModelCache cleared.")
+        """Clear all cached models."""
+        with self._lock:
+            self.cache.clear()
+        logger.info("ModelCache cleared")

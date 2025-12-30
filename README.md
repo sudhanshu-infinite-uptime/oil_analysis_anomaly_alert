@@ -53,4 +53,4 @@ docker ps
 Step 3- run send_test_message.py file <br>
 docker exec -it flink-jobmanager python /opt/flink/app/tools/send_test_message.py
 
-Step 4- check the models folder
+Step 4- check the models folde
