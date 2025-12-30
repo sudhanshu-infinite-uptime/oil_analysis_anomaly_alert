@@ -159,7 +159,7 @@ _BROKER_LIST = _env_list("KAFKA_ENDPOINTS", ["kafka:9092"])
 
 CONFIG = Config(
     # Kafka
-    INPUT_TOPIC=_env_str("INPUT_TOPIC", "iu_external_device_data_v1"),
+    INPUT_TOPIC=_env_str("INPUT_TOPIC", "external_device_data_flink_source"),
     ALERT_TOPIC=_env_str("ALERT_TOPIC", "oil-analysis-anomaly-alert"),
     BROKERS=_BROKER_LIST,
     KAFKA_BROKERS=",".join(_BROKER_LIST),
