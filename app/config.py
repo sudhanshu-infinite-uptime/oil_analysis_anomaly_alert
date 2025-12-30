@@ -107,6 +107,17 @@ MODEL_FEATURE_CODES = [
     "001_F",
 ]
 
+# Canonical ML feature order (USED BY MODEL)
+FEATURES = [
+    "Dielectric Constant",
+    "Oil Density",
+    "Kinematic Viscosity",
+    "Moisture",
+    "Water Activity",
+    "Oil Temperature",
+]
+
+
 # -------------------------------------------------------------------
 # Typed configuration object
 # -------------------------------------------------------------------
@@ -206,4 +217,5 @@ __all__ = [
     "Config",
     "FEATURE_MAP",
     "MODEL_FEATURE_CODES",
+    "FEATURES"
 ]

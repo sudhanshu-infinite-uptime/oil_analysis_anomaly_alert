@@ -65,7 +65,7 @@ class TrendAPIClient:
         payload = {
             "startDateTime": start_time.isoformat() + "Z",
             "endDateTime": end_time.isoformat() + "Z",
-            "intervalValue": 1,
+            "intervalValue": 6,
             "intervalUnit": "hour",
             "externalDeviceParameterGroupIds": [int(monitor_id)],
         }
