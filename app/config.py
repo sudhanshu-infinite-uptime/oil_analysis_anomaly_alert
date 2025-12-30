@@ -177,7 +177,7 @@ CONFIG = Config(
     # Trend API
     TREND_API_BASE_URL=_env_str(
         "TREND_API_BASE_URL",
-        "http://localhost:5000/api/v1/trend",
+        "https://api.infinite-uptime.com/api/3.0/idap-api/external-monitors/trend-history"
     ),
     TREND_API_TOKEN=_env_str("TREND_API_TOKEN", ""),
 
