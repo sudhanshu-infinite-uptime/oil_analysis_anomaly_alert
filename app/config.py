@@ -82,7 +82,7 @@ FEATURE_MAP = {
     "001_C": "Moisture",
     "001_D": "Kinematic Viscosity",
     "001_E": "Oil Density",
-    "001_F": "Dielectric Constant",
+    "001_F": "Oil Dielectric Constant",
     "001_G": "Ferrous Particles Level 1",
     "001_H": "Ferrous Particles Level 2",
     "001_I": "Ferrous Particles Level 3",
@@ -109,7 +109,7 @@ MODEL_FEATURE_CODES = [
 
 # Canonical ML feature order (USED BY MODEL)
 FEATURES = [
-    "Dielectric Constant",
+    "Oil Dielectric Constant",
     "Oil Density",
     "Kinematic Viscosity",
     "Moisture",

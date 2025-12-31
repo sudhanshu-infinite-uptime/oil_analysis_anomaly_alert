@@ -6,14 +6,10 @@ used during model training.
 
 Responsibilities:
 - Call Infinite Uptime Trend History API
-- Handle authentication and request formatting
+- Use DevOps-provided authentication token
+- Fetch fixed historical time range (as per business requirement)
 - Validate HTTP and JSON responses
-- Return normalized historical records
-
-Design principles:
-- Fail fast on misconfiguration
-- Never return partial / invalid data
-- Raise domain-specific APICallError only
+- Return complete historical records
 
 This module does NOT:
 - Train models
@@ -24,13 +20,13 @@ This module does NOT:
 
 from __future__ import annotations
 
-import requests
 from typing import List, Dict, Any
-from datetime import datetime, timedelta
+
+import requests
 
 from app.config import CONFIG
-from app.utils.logging_utils import get_logger
 from app.utils.exceptions import APICallError
+from app.utils.logging_utils import get_logger
 
 logger = get_logger(__name__)
 
@@ -41,12 +37,6 @@ class TrendAPIClient:
     """
 
     def __init__(self) -> None:
-        """
-        Initialize the Trend API client.
-
-        Raises:
-            RuntimeError: If mandatory configuration is missing
-        """
         if not CONFIG.TREND_API_BASE_URL:
             raise RuntimeError("TREND_API_BASE_URL is not configured")
 
@@ -54,50 +44,44 @@ class TrendAPIClient:
             raise RuntimeError("TREND_API_TOKEN is not configured")
 
         self.base_url: str = CONFIG.TREND_API_BASE_URL
+        self.token: str = CONFIG.TREND_API_TOKEN
         self.timeout: int = 30
 
     def get_history(
         self,
         monitor_id: str,
-        months: int,
-        access_token: str,
     ) -> List[Dict[str, Any]]:
         """
-        Fetch historical trend data for a given MONITORID.
+        Fetch historical trend data for a given MONITORID
+        using a fixed date range.
 
         Args:
             monitor_id: External device / parameter group ID
-            months: Number of months of history to fetch
-            access_token: Bearer token for API authentication
 
         Returns:
-            List of historical records from the API
+            List of historical records
 
         Raises:
-            APICallError: On any HTTP, network, or data validation failure
+            APICallError on failure
         """
 
-        end_time = datetime.utcnow()
-        start_time = end_time - timedelta(days=30 * months)
-
         payload = {
-            "startDateTime": start_time.isoformat() + "Z",
-            "endDateTime": end_time.isoformat() + "Z",
+            "startDateTime": "2025-11-29T10:05:00.000Z",
+            "endDateTime": "2025-12-29T10:05:00.000Z",
             "intervalValue": 6,
             "intervalUnit": "hour",
             "externalDeviceParameterGroupIds": [int(monitor_id)],
         }
 
         headers = {
-            "Authorization": f"Bearer {access_token}",
+            "Authorization": f"Bearer {self.token}",
             "Content-Type": "application/json",
             "Accept": "application/json",
         }
 
         logger.info(
-            "Fetching trend history | MONITORID=%s | months=%s",
+            "Fetching FIXED trend history | MONITORID=%s",
             monitor_id,
-            months,
         )
 
         try:
@@ -118,7 +102,7 @@ class TrendAPIClient:
             raise APICallError(
                 self.base_url,
                 401,
-                "Unauthorized: invalid or expired token",
+                "Unauthorized: invalid or expired TREND_API_TOKEN",
             )
 
         if response.status_code != 200:
@@ -137,20 +121,13 @@ class TrendAPIClient:
                 f"Invalid JSON response: {exc}",
             )
 
-        if not isinstance(data, dict):
-            raise APICallError(
-                self.base_url,
-                200,
-                "Response payload must be a JSON object",
-            )
-
         records = data.get("records") or data.get("data")
 
         if not isinstance(records, list) or not records:
             raise APICallError(
                 self.base_url,
                 200,
-                "No historical records returned",
+                "No historical records returned by Trend API",
             )
 
         logger.info(
