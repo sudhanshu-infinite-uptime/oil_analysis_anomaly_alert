@@ -47,6 +47,8 @@ RUN pip install --no-cache-dir \
 
 # install boto3 for S3
 RUN pip install boto3
+RUN pip install --no-cache-dir python-jose[cryptography]
+
 
 
 # ------------------------------------------------------------

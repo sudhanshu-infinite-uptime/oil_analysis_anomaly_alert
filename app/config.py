@@ -97,7 +97,6 @@ FEATURE_MAP = {
     "001_R": "Total Non-Ferrous Particles",
 }
 
-# ML feature codes used for training
 MODEL_FEATURE_CODES = [
     "001_A",
     "001_B",
@@ -107,7 +106,6 @@ MODEL_FEATURE_CODES = [
     "001_F",
 ]
 
-# Canonical ML feature order (USED BY MODEL)
 FEATURES = [
     "Oil Dielectric Constant",
     "Oil Density",
@@ -142,6 +140,11 @@ class Config:
     # Trend API
     TREND_API_BASE_URL: str
     TREND_API_TOKEN: str
+
+    # Token-based auth (NEW – DO NOT REMOVE)
+    TOKEN_URL: str
+    TOKEN_USERNAME: str
+    TOKEN_PASSWORD: str
 
     # AWS / S3
     S3_BUCKET_NAME: str
@@ -181,6 +184,11 @@ CONFIG = Config(
     ),
     TREND_API_TOKEN=_env_str("TREND_API_TOKEN", ""),
 
+    # Token auth (NEW)
+    TOKEN_URL=_env_str("TOKEN_URL", ""),
+    TOKEN_USERNAME=_env_str("TOKEN_USERNAME", ""),
+    TOKEN_PASSWORD=_env_str("TOKEN_PASSWORD", ""),
+
     # AWS
     S3_BUCKET_NAME=_env_str("S3_BUCKET_NAME", ""),
 
@@ -199,11 +207,18 @@ _missing = []
 if not CONFIG.S3_BUCKET_NAME:
     _missing.append("S3_BUCKET_NAME")
 
-if not CONFIG.TREND_API_TOKEN:
-    _missing.append("TREND_API_TOKEN")
-
 if not CONFIG.BROKERS:
     _missing.append("KAFKA_ENDPOINTS")
+
+# Token auth validation (NEW)
+if not CONFIG.TOKEN_URL:
+    _missing.append("TOKEN_URL")
+
+if not CONFIG.TOKEN_USERNAME:
+    _missing.append("TOKEN_USERNAME")
+
+if not CONFIG.TOKEN_PASSWORD:
+    _missing.append("TOKEN_PASSWORD")
 
 if _missing:
     raise RuntimeError(
@@ -217,5 +232,5 @@ __all__ = [
     "Config",
     "FEATURE_MAP",
     "MODEL_FEATURE_CODES",
-    "FEATURES"
+    "FEATURES",
 ]
