@@ -22,7 +22,6 @@ This module does NOT:
 from __future__ import annotations
 
 import json
-import pickle
 import logging
 from pathlib import Path
 from typing import Dict
@@ -54,7 +53,12 @@ S3_CLIENT = boto3.client(
 # Helpers
 # ------------------------------------------------------------
 def _s3_key(monitor_id: str, filename: str) -> str:
-    return f"models/{monitor_id}/{filename}"
+    """
+    Final S3 key structure (APPROVED BY DEVOPS):
+
+    s3://<bucket>/oil-analysis-anomaly-alerts/<MONITORID>/<filename>
+    """
+    return f"oil-analysis-anomaly-alerts/{monitor_id}/{filename}"
 
 
 # ------------------------------------------------------------
@@ -87,12 +91,6 @@ def save_binary(virtual_path: str, data: bytes) -> None:
 def load_binary(virtual_path: str) -> bytes:
     """
     Load a binary artifact from S3.
-
-    Args:
-        virtual_path: "<monitor_id>/<filename>"
-
-    Returns:
-        Raw bytes
     """
     monitor_id = Path(virtual_path).parent.name
     filename = Path(virtual_path).name

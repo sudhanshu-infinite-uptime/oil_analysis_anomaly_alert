@@ -38,28 +38,22 @@ from app.config import CONFIG
 logger = get_logger(__name__)
 
 
-def build_model_for_monitor(
-    monitor_id: str,
-    df: Optional[pd.DataFrame] = None,
-    months: int = 3,
+def build_model_for_parameter_group(
+    parameter_group_id: int,
+    start_datetime: str,
+    end_datetime: str,
 ) -> None:
     """
-    Train and persist a model for a given MONITORID.
+    Train and persist a model using Trend API data.
 
-    This function is Flink-safe:
-    - It never raises exceptions outward
-    - Any failure results in a logged error and graceful return
-
-    Args:
-        monitor_id: Monitor identifier
-        df: Optional live dataframe (currently unused)
-        months: Number of months of historical data to fetch
+    IMPORTANT:
+    - parameter_group_id is INPUT
+    - monitor_id is DERIVED from Trend API
     """
 
     logger.info(
-        "Model training started | MONITORID=%s | months=%s",
-        monitor_id,
-        months,
+        "Model training started | parameter_group_id=%s",
+        parameter_group_id,
     )
 
     # --------------------------------------------------
@@ -68,23 +62,41 @@ def build_model_for_monitor(
     try:
         client = TrendAPIClient()
         records = client.get_history(
-            monitor_id=monitor_id
+            parameter_group_id=parameter_group_id,
+            start_datetime=start_datetime,
+            end_datetime=end_datetime,
         )
     except Exception as exc:
         logger.error(
-            "Trend API failure | MONITORID=%s | error=%s",
-            monitor_id,
+            "Trend API failure | parameter_group_id=%s | error=%s",
+            parameter_group_id,
             exc,
             exc_info=True,
         )
         return
 
+    if not records:
+        logger.warning(
+            "No records returned | parameter_group_id=%s",
+            parameter_group_id,
+        )
+        return
+
+    # ✅ REAL monitorId from API
+    monitor_id = records[0]["MONITORID"]
+
+    logger.info(
+        "Resolved monitor_id=%s from parameter_group_id=%s",
+        monitor_id,
+        parameter_group_id,
+    )
+
     # --------------------------------------------------
-    # Step 2: Extract PROCESS_PARAMETER payload
+    # Step 2: Extract PROCESS_PARAMETER
     # --------------------------------------------------
     rows = []
     for record in records:
-        params = record.get("PROCESS_PARAMETER") or record.get("processParameter")
+        params = record.get("PROCESS_PARAMETER")
         if isinstance(params, dict):
             rows.append(params)
 
@@ -99,7 +111,7 @@ def build_model_for_monitor(
 
     if train_df.empty:
         logger.warning(
-            "Training DataFrame empty after cleanup | MONITORID=%s",
+            "Training DataFrame empty | MONITORID=%s",
             monitor_id,
         )
         return
@@ -133,20 +145,15 @@ def build_model_for_monitor(
         "feature_names": list(train_df.columns),
         "rows_used": len(train_df),
         "algorithm": "IsolationForest",
+        "parameter_group_id": parameter_group_id,
     }
 
     # --------------------------------------------------
-    # Step 4: Persist artifacts
+    # Step 4: Persist artifacts (KEYED BY monitor_id)
     # --------------------------------------------------
     try:
-        save_binary(
-            f"{monitor_id}/model.pkl",
-            pickle.dumps(model),
-        )
-        save_binary(
-            f"{monitor_id}/scaler.pkl",
-            pickle.dumps(scaler),
-        )
+        save_binary(f"{monitor_id}/model.pkl", pickle.dumps(model))
+        save_binary(f"{monitor_id}/scaler.pkl", pickle.dumps(scaler))
         save_metadata(monitor_id, metadata)
     except Exception as exc:
         logger.error(

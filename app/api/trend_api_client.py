@@ -4,22 +4,11 @@ app/api/trend_api_client.py
 Production-ready HTTP client for fetching historical trend data
 used during model training.
 
-Key features:
-- Automatic JWT token refresh (session-safe for Flink jobs)
-- Uses DevOps-provided username/password credentials
-- Fetches historical trend data from Infinite Uptime API
-- Strict validation of HTTP and response payloads
+Aligned 1:1 with verified standalone script.
 
-This module DOES:
-- Handle authentication lifecycle
-- Call Trend History API
-- Return normalized historical readings (canonical format)
-
-This module DOES NOT:
-- Train models
-- Perform feature engineering
-- Persist data
-- Interact with Kafka or Flink APIs directly
+IMPORTANT:
+- externalDeviceParameterGroupIds is REQUIRED
+- monitorId is returned by the API, not supplied
 """
 
 from __future__ import annotations
@@ -39,13 +28,9 @@ logger = get_logger(__name__)
 
 
 # -------------------------------------------------------------------
-# Token Manager (session-safe)
+# Token Manager (standalone-aligned)
 # -------------------------------------------------------------------
 class TokenManager:
-    """
-    Handles access-token generation and refresh using username/password.
-    """
-
     def __init__(self) -> None:
         if not CONFIG.TOKEN_URL:
             raise RuntimeError("TOKEN_URL is not configured")
@@ -60,7 +45,7 @@ class TokenManager:
         self.expiry: int = 0
 
     def _generate_token(self) -> None:
-        logger.info("Generating new Trend API access token")
+        logger.info("Generating Trend API access token")
 
         response = requests.post(
             self.token_url,
@@ -87,7 +72,7 @@ class TokenManager:
         self.access_token = token
         self.expiry = decoded["exp"]
 
-        logger.info("Trend API token generated successfully")
+        logger.info("Trend API access token generated successfully")
 
     def get_token(self) -> str:
         now = int(time.time())
@@ -104,6 +89,9 @@ class TokenManager:
 class TrendAPIClient:
     """
     Client wrapper for Infinite Uptime Trend History API.
+
+    Input  : externalDeviceParameterGroupId
+    Output : monitorId (derived)
     """
 
     def __init__(self) -> None:
@@ -114,25 +102,24 @@ class TrendAPIClient:
         self.timeout: int = 30
         self.token_manager = TokenManager()
 
-    def get_history(self, monitor_id: str) -> List[Dict[str, Any]]:
+    def get_history(
+        self,
+        parameter_group_id: int,
+        start_datetime: str,
+        end_datetime: str,
+        interval_value: int = 6,
+        interval_unit: str = "hour",
+    ) -> List[Dict[str, Any]]:
         """
-        Fetch historical trend data for a given MONITORID.
+        Fetch historical trend data using externalDeviceParameterGroupId.
 
-        Returns records in the canonical internal format:
+        Returns canonical internal format:
         {
             "MONITORID": <int>,
-            "PROCESS_PARAMETER": { "001_A": float, ... },
+            "PROCESS_PARAMETER": {...},
             "timestamp": <str>
         }
         """
-
-        payload = {
-            "startDateTime": "2025-11-29T10:05:00.000Z",
-            "endDateTime": "2025-12-29T10:05:00.000Z",
-            "intervalValue": 6,
-            "intervalUnit": "hour",
-            "externalDeviceParameterGroupIds": [int(monitor_id)],
-        }
 
         token = self.token_manager.get_token()
 
@@ -142,13 +129,24 @@ class TrendAPIClient:
             "Accept": "*/*",
         }
 
-        logger.info("Fetching trend history | MONITORID=%s", monitor_id)
+        payload = {
+            "startDateTime": start_datetime,
+            "endDateTime": end_datetime,
+            "intervalValue": interval_value,
+            "intervalUnit": interval_unit,
+            "externalDeviceParameterGroupIds": [int(parameter_group_id)],
+        }
+
+        logger.info(
+            "Fetching trend history | parameter_group_id=%s",
+            parameter_group_id,
+        )
 
         try:
             response = requests.post(
                 self.base_url,
-                json=payload,
                 headers=headers,
+                json=payload,
                 timeout=self.timeout,
             )
         except requests.RequestException as exc:
@@ -162,7 +160,7 @@ class TrendAPIClient:
             raise APICallError(
                 self.base_url,
                 401,
-                "Unauthorized: token refresh failed",
+                "Unauthorized: token invalid or expired",
             )
 
         if response.status_code != 200:
@@ -205,16 +203,16 @@ class TrendAPIClient:
             except Exception:
                 continue
 
-            record = {
-                "MONITORID": r.get("monitorId"),
-                "PROCESS_PARAMETER": {
-                    k: float(v) if v not in (None, "", "null") else None
-                    for k, v in raw.items()
-                },
-                "timestamp": r.get("time"),
-            }
-
-            normalized.append(record)
+            normalized.append(
+                {
+                    "MONITORID": r.get("monitorId"),
+                    "PROCESS_PARAMETER": {
+                        k: float(v) if v not in (None, "", "null") else None
+                        for k, v in raw.items()
+                    },
+                    "timestamp": r.get("time"),
+                }
+            )
 
         if not normalized:
             raise APICallError(
@@ -224,8 +222,8 @@ class TrendAPIClient:
             )
 
         logger.info(
-            "Trend API success | MONITORID=%s | records=%d",
-            monitor_id,
+            "Trend API success | monitor_id=%s | records=%d",
+            normalized[0]["MONITORID"],
             len(normalized),
         )
 
