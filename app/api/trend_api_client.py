@@ -13,7 +13,7 @@ Key features:
 This module DOES:
 - Handle authentication lifecycle
 - Call Trend History API
-- Return normalized historical readings (jsonavg)
+- Return normalized historical readings (canonical format)
 
 This module DOES NOT:
 - Train models
@@ -92,7 +92,6 @@ class TokenManager:
     def get_token(self) -> str:
         now = int(time.time())
 
-        # Refresh token 60s before expiry
         if not self.access_token or now >= self.expiry - 60:
             self._generate_token()
 
@@ -117,17 +116,14 @@ class TrendAPIClient:
 
     def get_history(self, monitor_id: str) -> List[Dict[str, Any]]:
         """
-        Fetch historical trend data for a given MONITORID
-        using the fixed business-approved time range.
+        Fetch historical trend data for a given MONITORID.
 
-        Args:
-            monitor_id: External device / parameter group ID
-
-        Returns:
-            List of normalized historical records (jsonavg per timestamp)
-
-        Raises:
-            APICallError on failure
+        Returns records in the canonical internal format:
+        {
+            "MONITORID": <int>,
+            "PROCESS_PARAMETER": { "001_A": float, ... },
+            "timestamp": <str>
+        }
         """
 
         payload = {
@@ -205,14 +201,20 @@ class TrendAPIClient:
 
         for r in readings:
             try:
-                values = json.loads(r["jsonavg"])
+                raw = json.loads(r["jsonavg"])
             except Exception:
                 continue
 
-            values["timestamp"] = r.get("time")
-            values["monitor_id"] = r.get("monitorId")
+            record = {
+                "MONITORID": r.get("monitorId"),
+                "PROCESS_PARAMETER": {
+                    k: float(v) if v not in (None, "", "null") else None
+                    for k, v in raw.items()
+                },
+                "timestamp": r.get("time"),
+            }
 
-            normalized.append(values)
+            normalized.append(record)
 
         if not normalized:
             raise APICallError(
@@ -222,7 +224,7 @@ class TrendAPIClient:
             )
 
         logger.info(
-            "Trend API success | MONITORID=%s | records=%s",
+            "Trend API success | MONITORID=%s | records=%d",
             monitor_id,
             len(normalized),
         )

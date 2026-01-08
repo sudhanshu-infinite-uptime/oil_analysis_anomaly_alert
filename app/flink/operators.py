@@ -52,6 +52,7 @@ class MultiModelAnomalyOperator(FlatMapFunction):
         if not monitor_id:
             return
 
+
         # ---------------------------------------------------------
         # Sliding window setup
         # ---------------------------------------------------------
@@ -62,6 +63,8 @@ class MultiModelAnomalyOperator(FlatMapFunction):
             )
 
         window = self.windows[monitor_id]
+
+        
         window.add(record)
 
         if not window.is_full():
