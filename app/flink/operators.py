@@ -75,7 +75,7 @@ class MultiModelAnomalyOperator(FlatMapFunction):
         # ---------------------------------------------------------
         if not model_exists(monitor_id):
             logger.warning(
-                "Model missing → skipping inference | MONITORID=%s",
+                "Model not found → skipping inference | MONITORID=%s",
                 monitor_id,
             )
             window.slide()
