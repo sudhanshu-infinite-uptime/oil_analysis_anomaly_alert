@@ -68,9 +68,7 @@ def build_model_for_monitor(
     try:
         client = TrendAPIClient()
         records = client.get_history(
-            monitor_id=monitor_id,
-            months=months,
-            access_token=CONFIG.TREND_API_TOKEN,
+            monitor_id=monitor_id
         )
     except Exception as exc:
         logger.error(
