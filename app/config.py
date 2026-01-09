@@ -97,6 +97,7 @@ FEATURE_MAP = {
     "001_R": "Total Non-Ferrous Particles",
 }
 
+# ✅ ONLY THESE FEATURES ARE USED FOR MODEL
 MODEL_FEATURE_CODES = [
     "001_A",
     "001_B",
@@ -113,6 +114,23 @@ FEATURES = [
     "Moisture",
     "Water Activity",
     "Oil Temperature",
+]
+
+# -------------------------------------------------------------------
+# 🔒 Model feature enforcement (ADDED – DO NOT REMOVE)
+# -------------------------------------------------------------------
+# Canonical ordered feature list for training & prediction
+MODEL_FEATURE_CODES_ORDERED = tuple(MODEL_FEATURE_CODES)
+
+# Code → Human-readable name (for alerts / explainability)
+MODEL_FEATURE_NAME_MAP = {
+    code: FEATURE_MAP[code]
+    for code in MODEL_FEATURE_CODES
+}
+
+# Ordered names (used in metadata/debugging only)
+MODEL_FEATURE_NAMES_ORDERED = [
+    FEATURE_MAP[code] for code in MODEL_FEATURE_CODES
 ]
 
 
@@ -141,7 +159,7 @@ class Config:
     TREND_API_BASE_URL: str
     TREND_API_TOKEN: str
 
-    # Token-based auth (NEW – DO NOT REMOVE)
+    # Token-based auth
     TOKEN_URL: str
     TOKEN_USERNAME: str
     TOKEN_PASSWORD: str
@@ -184,7 +202,7 @@ CONFIG = Config(
     ),
     TREND_API_TOKEN=_env_str("TREND_API_TOKEN", ""),
 
-    # Token auth (NEW)
+    # Token auth
     TOKEN_URL=_env_str("TOKEN_URL", ""),
     TOKEN_USERNAME=_env_str("TOKEN_USERNAME", ""),
     TOKEN_PASSWORD=_env_str("TOKEN_PASSWORD", ""),
@@ -200,7 +218,7 @@ CONFIG = Config(
 
 
 # -------------------------------------------------------------------
-# Fail-fast validation (VERY IMPORTANT FOR PROD)
+# 🚨 Fail-fast validation (VERY IMPORTANT)
 # -------------------------------------------------------------------
 _missing = []
 
@@ -210,7 +228,6 @@ if not CONFIG.S3_BUCKET_NAME:
 if not CONFIG.BROKERS:
     _missing.append("KAFKA_ENDPOINTS")
 
-# Token auth validation (NEW)
 if not CONFIG.TOKEN_URL:
     _missing.append("TOKEN_URL")
 
@@ -227,10 +244,31 @@ if _missing:
     )
 
 
+# -------------------------------------------------------------------
+# 🚨 Feature sanity checks (ADDED – PROD SAFETY)
+# -------------------------------------------------------------------
+if len(MODEL_FEATURE_CODES) != 6:
+    raise RuntimeError(
+        f"MODEL_FEATURE_CODES must contain exactly 6 features, got {len(MODEL_FEATURE_CODES)}"
+    )
+
+for code in MODEL_FEATURE_CODES:
+    if code not in FEATURE_MAP:
+        raise RuntimeError(
+            f"Feature code {code} missing in FEATURE_MAP"
+        )
+
+
+# -------------------------------------------------------------------
+# Public exports
+# -------------------------------------------------------------------
 __all__ = [
     "CONFIG",
     "Config",
     "FEATURE_MAP",
     "MODEL_FEATURE_CODES",
     "FEATURES",
+    "MODEL_FEATURE_CODES_ORDERED",
+    "MODEL_FEATURE_NAME_MAP",
+    "MODEL_FEATURE_NAMES_ORDERED",
 ]

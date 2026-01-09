@@ -9,6 +9,7 @@ Aligned 1:1 with verified standalone script.
 IMPORTANT:
 - externalDeviceParameterGroupIds is REQUIRED
 - monitorId is returned by the API, not supplied
+- ALL monitorIds returned by the API are processed
 """
 
 from __future__ import annotations
@@ -28,7 +29,7 @@ logger = get_logger(__name__)
 
 
 # -------------------------------------------------------------------
-# Token Manager (standalone-aligned)
+# Token Manager
 # -------------------------------------------------------------------
 class TokenManager:
     def __init__(self) -> None:
@@ -76,10 +77,8 @@ class TokenManager:
 
     def get_token(self) -> str:
         now = int(time.time())
-
         if not self.access_token or now >= self.expiry - 60:
             self._generate_token()
-
         return self.access_token
 
 
@@ -91,7 +90,7 @@ class TrendAPIClient:
     Client wrapper for Infinite Uptime Trend History API.
 
     Input  : externalDeviceParameterGroupId
-    Output : monitorId (derived)
+    Output : multiple monitorIds (derived from API)
     """
 
     def __init__(self) -> None:
@@ -113,7 +112,7 @@ class TrendAPIClient:
         """
         Fetch historical trend data using externalDeviceParameterGroupId.
 
-        Returns canonical internal format:
+        Returns canonical internal format (ALL monitors):
         {
             "MONITORID": <int>,
             "PROCESS_PARAMETER": {...},
@@ -187,32 +186,31 @@ class TrendAPIClient:
                 "No monitors returned by Trend API",
             )
 
-        readings = monitors[0].get("readings", [])
-        if not readings:
-            raise APICallError(
-                self.base_url,
-                200,
-                "No readings returned by Trend API",
-            )
-
         normalized: List[Dict[str, Any]] = []
 
-        for r in readings:
-            try:
-                raw = json.loads(r["jsonavg"])
-            except Exception:
+        for monitor in monitors:
+            monitor_id = monitor.get("monitorId")
+            readings = monitor.get("readings", [])
+
+            if not readings:
                 continue
 
-            normalized.append(
-                {
-                    "MONITORID": r.get("monitorId"),
-                    "PROCESS_PARAMETER": {
-                        k: float(v) if v not in (None, "", "null") else None
-                        for k, v in raw.items()
-                    },
-                    "timestamp": r.get("time"),
-                }
-            )
+            for r in readings:
+                try:
+                    raw = json.loads(r["jsonavg"])
+                except Exception:
+                    continue
+
+                normalized.append(
+                    {
+                        "MONITORID": monitor_id,
+                        "PROCESS_PARAMETER": {
+                            k: float(v) if v not in (None, "", "null") else None
+                            for k, v in raw.items()
+                        },
+                        "timestamp": r.get("time"),
+                    }
+                )
 
         if not normalized:
             raise APICallError(
@@ -222,8 +220,8 @@ class TrendAPIClient:
             )
 
         logger.info(
-            "Trend API success | monitor_id=%s | records=%d",
-            normalized[0]["MONITORID"],
+            "Trend API success | monitors=%d | records=%d",
+            len({r['MONITORID'] for r in normalized}),
             len(normalized),
         )
 
