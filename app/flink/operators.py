@@ -52,7 +52,7 @@ class MultiModelAnomalyOperator(FlatMapFunction):
         if not record:
             return
 
-        device_id = record.get("deviceId")
+        device_id = record.get("DEVICEID")
         if not device_id:
             return
 
