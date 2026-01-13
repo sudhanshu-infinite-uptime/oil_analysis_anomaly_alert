@@ -1,7 +1,9 @@
 import requests
+
 from app.config import CONFIG
 from app.utils.logging_utils import get_logger
 from app.utils.exceptions import APICallError
+from app.api.token_manager import TokenManager
 
 logger = get_logger(__name__)
 
@@ -12,6 +14,7 @@ class DeviceAPIClient:
             raise RuntimeError("EXTERNAL_DEVICE_API_BASE_URL not configured")
 
         self.base_url = CONFIG.EXTERNAL_DEVICE_API_BASE_URL
+        self.token_manager = TokenManager()
 
     # ------------------------------------------------------------------
     # EXISTING METHOD (DO NOT BREAK)
@@ -50,12 +53,13 @@ class DeviceAPIClient:
         """
         Resolve DEVICEID → (MONITORID, PARAMETER_GROUP_ID)
 
-        This method is safe for streaming usage.
+        Safe for streaming:
+        - Token is cached
+        - No blocking filesystem calls
+        - No shared mutable state
         """
 
-        from app.api.token_manager import TokenManager
-
-        token = TokenManager().get_token()
+        token = self.token_manager.get_token()
 
         url = f"{self.base_url}/external-devices/{device_id}/parameters"
 
