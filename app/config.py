@@ -8,9 +8,6 @@ Responsibilities:
 - Provide strongly-typed configuration
 - Expose a single CONFIG object used across the system
 - Fail fast if required configuration is missing
-
-Usage:
-    from app.config import CONFIG
 """
 
 from __future__ import annotations
@@ -117,18 +114,15 @@ FEATURES = [
 ]
 
 # -------------------------------------------------------------------
-# 🔒 Model feature enforcement (ADDED – DO NOT REMOVE)
+# 🔒 Model feature enforcement
 # -------------------------------------------------------------------
-# Canonical ordered feature list for training & prediction
 MODEL_FEATURE_CODES_ORDERED = tuple(MODEL_FEATURE_CODES)
 
-# Code → Human-readable name (for alerts / explainability)
 MODEL_FEATURE_NAME_MAP = {
     code: FEATURE_MAP[code]
     for code in MODEL_FEATURE_CODES
 }
 
-# Ordered names (used in metadata/debugging only)
 MODEL_FEATURE_NAMES_ORDERED = [
     FEATURE_MAP[code] for code in MODEL_FEATURE_CODES
 ]
@@ -155,7 +149,14 @@ class Config:
     ANOMALY_CONTAMINATION: float
     MODEL_CACHE_SIZE: int
 
-    # Trend API
+    # Training window (auto-train on first event)
+    TRAIN_START_TIME: str
+    TRAIN_END_TIME: str
+
+    # Parameter group fallback
+    DEFAULT_PARAMETER_GROUP_ID: int
+
+    # Trend / Device API
     TREND_API_BASE_URL: str
     TREND_API_TOKEN: str
     EXTERNAL_DEVICE_API_BASE_URL: str
@@ -172,6 +173,7 @@ class Config:
     LOG_DIR: Path
     DEBUG: bool
     FLINK_PARALLELISM: int
+    ENVIRONMENT: str
 
 
 # -------------------------------------------------------------------
@@ -196,13 +198,32 @@ CONFIG = Config(
     ANOMALY_CONTAMINATION=_env_float("ANOMALY_CONTAMINATION", 0.05),
     MODEL_CACHE_SIZE=_env_int("MODEL_CACHE_SIZE", 32),
 
-    # Trend API
+    # Training window
+    TRAIN_START_TIME=_env_str(
+        "TRAIN_START_TIME",
+        "2025-11-29T10:05:00.000Z",
+    ),
+    TRAIN_END_TIME=_env_str(
+        "TRAIN_END_TIME",
+        "2025-12-29T10:05:00.000Z",
+    ),
+
+    # Parameter group
+    DEFAULT_PARAMETER_GROUP_ID=_env_int(
+        "DEFAULT_PARAMETER_GROUP_ID",
+        123,
+    ),
+
+    # Trend / Device API
     TREND_API_BASE_URL=_env_str(
         "TREND_API_BASE_URL",
-        "https://api.infinite-uptime.com/api/3.0/idap-api/external-monitors/trend-history"
+        "https://api.infinite-uptime.com/api/3.0/idap-api/external-monitors/trend-history",
     ),
     TREND_API_TOKEN=_env_str("TREND_API_TOKEN", ""),
-    EXTERNAL_DEVICE_API_BASE_URL=_env_str("EXTERNAL_DEVICE_API_BASE_URL", ""),
+    EXTERNAL_DEVICE_API_BASE_URL=_env_str(
+        "EXTERNAL_DEVICE_API_BASE_URL",
+        "",
+    ),
 
     # Token auth
     TOKEN_URL=_env_str("TOKEN_URL", ""),
@@ -216,11 +237,12 @@ CONFIG = Config(
     LOG_DIR=LOG_DIR,
     DEBUG=_env_bool("DEBUG", False),
     FLINK_PARALLELISM=_env_int("FLINK_PARALLELISM", 1),
+    ENVIRONMENT=_env_str("ENVIRONMENT", "local"),
 )
 
 
 # -------------------------------------------------------------------
-# 🚨 Fail-fast validation (VERY IMPORTANT)
+# 🚨 Fail-fast validation
 # -------------------------------------------------------------------
 _missing = []
 
@@ -242,6 +264,14 @@ if not CONFIG.TOKEN_PASSWORD:
 if not CONFIG.EXTERNAL_DEVICE_API_BASE_URL:
     _missing.append("EXTERNAL_DEVICE_API_BASE_URL")
 
+if not CONFIG.TRAIN_START_TIME:
+    _missing.append("TRAIN_START_TIME")
+
+if not CONFIG.TRAIN_END_TIME:
+    _missing.append("TRAIN_END_TIME")
+
+if not CONFIG.DEFAULT_PARAMETER_GROUP_ID:
+    _missing.append("DEFAULT_PARAMETER_GROUP_ID")
 
 if _missing:
     raise RuntimeError(
@@ -251,7 +281,7 @@ if _missing:
 
 
 # -------------------------------------------------------------------
-# 🚨 Feature sanity checks (ADDED – PROD SAFETY)
+# 🚨 Feature sanity checks
 # -------------------------------------------------------------------
 if len(MODEL_FEATURE_CODES) != 6:
     raise RuntimeError(
