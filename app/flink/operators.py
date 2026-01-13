@@ -43,10 +43,12 @@ class MultiModelAnomalyOperator(FlatMapFunction):
 
     def open(self, runtime_context: RuntimeContext):
         logger.info("Initializing MultiModelAnomalyOperator")
+
         self.model_cache = ModelCache(max_size=CONFIG.MODEL_CACHE_SIZE)
         self.windows: Dict[int, SlidingWindow] = {}
         self.device_client = DeviceAPIClient()
 
+    # ------------------------------------------------------------------
     def flat_map(self, value: str):
         record = safe_json_parse(value)
         if not record:
@@ -57,7 +59,7 @@ class MultiModelAnomalyOperator(FlatMapFunction):
             return
 
         # ---------------------------------------------------------
-        # Resolve device → monitor
+        # Resolve device → monitor + parameter group
         # ---------------------------------------------------------
         try:
             monitor_id, parameter_group_id = (
@@ -73,6 +75,7 @@ class MultiModelAnomalyOperator(FlatMapFunction):
 
         # ---------------------------------------------------------
         # Train model ON-DEMAND if missing
+        # Guarded against parallel execution
         # ---------------------------------------------------------
         if not model_exists(monitor_id):
             logger.info(
@@ -88,17 +91,31 @@ class MultiModelAnomalyOperator(FlatMapFunction):
                     end_datetime=CONFIG.TRAIN_END_TIME,
                 )
             except Exception as exc:
-                logger.error(
-                    "Model training failed | MONITORID=%s | %s",
-                    monitor_id,
-                    exc,
-                )
-                return
+                if model_exists(monitor_id):
+                    logger.info(
+                        "Model already created by parallel task | MONITORID=%s",
+                        monitor_id,
+                    )
+                else:
+                    logger.error(
+                        "Model training failed | MONITORID=%s | %s",
+                        monitor_id,
+                        exc,
+                    )
+                    return
 
         # ---------------------------------------------------------
-        # Sliding window setup
+        # Sliding window setup (with memory protection)
         # ---------------------------------------------------------
         if monitor_id not in self.windows:
+            if len(self.windows) >= CONFIG.MAX_ACTIVE_MONITORS:
+                evicted = next(iter(self.windows))
+                self.windows.pop(evicted, None)
+                logger.warning(
+                    "Evicted sliding window | MONITORID=%s",
+                    evicted,
+                )
+
             self.windows[monitor_id] = SlidingWindow(
                 window_size=CONFIG.WINDOW_COUNT,
                 slide_size=CONFIG.SLIDE_COUNT,
@@ -162,14 +179,15 @@ class MultiModelAnomalyOperator(FlatMapFunction):
             )
             yield json.dumps(self._format_alert(monitor_id, result))
 
-    # ---------------------------------------------------------
+    # ------------------------------------------------------------------
     def _align_features(self, df: pd.DataFrame, feature_names: list) -> pd.DataFrame:
         for col in feature_names:
             if col not in df.columns:
                 df[col] = 0.0
+            df[col] = df[col].astype(float)
         return df[feature_names]
 
-    # ---------------------------------------------------------
+    # ------------------------------------------------------------------
     def _format_alert(self, monitor_id: int, result: Dict[str, Any]) -> Dict[str, Any]:
         return {
             "monitorId": monitor_id,

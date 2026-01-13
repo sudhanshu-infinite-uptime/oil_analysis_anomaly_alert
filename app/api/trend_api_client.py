@@ -4,8 +4,6 @@ app/api/trend_api_client.py
 Production-ready HTTP client for fetching historical trend data
 used during model training.
 
-Aligned 1:1 with verified standalone script.
-
 IMPORTANT:
 - externalDeviceParameterGroupIds is REQUIRED
 - monitorId is returned by the API, not supplied
@@ -15,71 +13,16 @@ IMPORTANT:
 from __future__ import annotations
 
 import json
-import time
 from typing import List, Dict, Any
 
 import requests
-from jose import jwt
 
 from app.config import CONFIG
+from app.api.token_manager import TokenManager
 from app.utils.logging_utils import get_logger
 from app.utils.exceptions import APICallError
 
 logger = get_logger(__name__)
-
-
-# -------------------------------------------------------------------
-# Token Manager
-# -------------------------------------------------------------------
-class TokenManager:
-    def __init__(self) -> None:
-        if not CONFIG.TOKEN_URL:
-            raise RuntimeError("TOKEN_URL is not configured")
-        if not CONFIG.TOKEN_USERNAME or not CONFIG.TOKEN_PASSWORD:
-            raise RuntimeError("TOKEN_USERNAME / TOKEN_PASSWORD not configured")
-
-        self.token_url = CONFIG.TOKEN_URL
-        self.username = CONFIG.TOKEN_USERNAME
-        self.password = CONFIG.TOKEN_PASSWORD
-
-        self.access_token: str | None = None
-        self.expiry: int = 0
-
-    def _generate_token(self) -> None:
-        logger.info("Generating Trend API access token")
-
-        response = requests.post(
-            self.token_url,
-            json={
-                "username": self.username,
-                "password": self.password,
-            },
-            headers={"Content-Type": "application/json"},
-            timeout=20,
-        )
-        response.raise_for_status()
-
-        token_response = response.json()
-
-        try:
-            token = token_response["data"]["accessToken"]
-        except KeyError:
-            raise RuntimeError(
-                f"Unexpected token response format: {token_response}"
-            )
-
-        decoded = jwt.get_unverified_claims(token)
-
-        self.access_token = token
-        self.expiry = decoded["exp"]
-
-        logger.info("Trend API access token generated successfully")
-
-    def get_token(self) -> str:
-        now = int(time.time())
-        if not self.access_token or now >= self.expiry - 60:
-            self._generate_token()
-        return self.access_token
 
 
 # -------------------------------------------------------------------
@@ -109,16 +52,6 @@ class TrendAPIClient:
         interval_value: int = 6,
         interval_unit: str = "hour",
     ) -> List[Dict[str, Any]]:
-        """
-        Fetch historical trend data using externalDeviceParameterGroupId.
-
-        Returns canonical internal format (ALL monitors):
-        {
-            "MONITORID": <int>,
-            "PROCESS_PARAMETER": {...},
-            "timestamp": <str>
-        }
-        """
 
         token = self.token_manager.get_token()
 
@@ -221,7 +154,7 @@ class TrendAPIClient:
 
         logger.info(
             "Trend API success | monitors=%d | records=%d",
-            len({r['MONITORID'] for r in normalized}),
+            len({r["MONITORID"] for r in normalized}),
             len(normalized),
         )
 
