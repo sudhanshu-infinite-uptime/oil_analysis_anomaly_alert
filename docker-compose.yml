@@ -2,36 +2,43 @@ version: "3.9"
 
 services:
   # ---------------------------------------------------------
-  # 🧠 Flink JobManager
+  # 🧠 Flink JobManager (AUTO-RUN PIPELINE)
   # ---------------------------------------------------------
   jobmanager:
     build:
       context: .
       dockerfile: Dockerfile
     container_name: flink-jobmanager
+
     command: ["jobmanager"]
 
     ports:
       - "8081:8081"
 
+    env_file:
+      - .env
+
     environment:
       PYTHONPATH: "/opt/flink/app:/opt/flink"
 
-      # Kafka (LOCAL DEV)
+      # Kafka
       KAFKA_ENDPOINTS: ${KAFKA_ENDPOINTS}
       INPUT_TOPIC: ${INPUT_TOPIC}
       ALERT_TOPIC: ${ALERT_TOPIC}
 
+      # APIs
       TREND_API_BASE_URL: ${TREND_API_BASE_URL}
-
       TOKEN_URL: ${TOKEN_URL}
       TOKEN_USERNAME: ${TOKEN_USERNAME}
       TOKEN_PASSWORD: ${TOKEN_PASSWORD}
+      EXTERNAL_DEVICE_API_BASE_URL: ${EXTERNAL_DEVICE_API_BASE_URL}
 
+      # AWS
       AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
       AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
       S3_BUCKET_NAME: ${S3_BUCKET_NAME}
 
+      # Flink
       JOB_MANAGER_RPC_ADDRESS: jobmanager
       TASK_MANAGER_SLOTS: 2
       PARALLELISM: 1
@@ -54,10 +61,14 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: flink-taskmanager
+
     command: ["taskmanager"]
 
     depends_on:
       - jobmanager
+
+    env_file:
+      - .env
 
     environment:
       PYTHONPATH: "/opt/flink/app:/opt/flink"
@@ -67,10 +78,10 @@ services:
       ALERT_TOPIC: ${ALERT_TOPIC}
 
       TREND_API_BASE_URL: ${TREND_API_BASE_URL}
-
       TOKEN_URL: ${TOKEN_URL}
       TOKEN_USERNAME: ${TOKEN_USERNAME}
       TOKEN_PASSWORD: ${TOKEN_PASSWORD}
+      EXTERNAL_DEVICE_API_BASE_URL: ${EXTERNAL_DEVICE_API_BASE_URL}
 
       AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
       AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
@@ -91,7 +102,7 @@ services:
     restart: always
 
   # ---------------------------------------------------------
-  # 🔊 Kafka (LOCAL DEV ONLY)
+  # 🔊 Kafka (LOCAL DEV)
   # ---------------------------------------------------------
   kafka:
     image: confluentinc/cp-kafka:7.5.1
@@ -128,48 +139,6 @@ services:
 
     restart: always
 
-  # ---------------------------------------------------------
-  # 🚀 Flink Job Submitter (DEV ONLY)
-  # ---------------------------------------------------------
-  flink-submit:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: flink-submit
-
-    depends_on:
-      - jobmanager
-      - taskmanager
-      - kafka
-
-    command: >
-      bash -c "
-        echo 'Waiting for Flink & Kafka...' &&
-        sleep 20 &&
-        flink run -py /opt/flink/app/main.py \
-          --jarfile /opt/flink/lib/flink-connector-kafka-3.2.0-1.19.jar
-      "
-
-    environment:
-      KAFKA_ENDPOINTS: ${KAFKA_ENDPOINTS}
-      INPUT_TOPIC: ${INPUT_TOPIC}
-      ALERT_TOPIC: ${ALERT_TOPIC}
-      TOKEN_URL: ${TOKEN_URL}
-      TOKEN_USERNAME: ${TOKEN_USERNAME}
-      TOKEN_PASSWORD: ${TOKEN_PASSWORD}
-
-    volumes:
-      - ./app:/opt/flink/app
-      - ./models:/opt/flink/models
-
-    networks:
-      - flink_kafka_net
-
-    restart: "no"
-
-# ---------------------------------------------------------
-# Network & Volumes
-# ---------------------------------------------------------
 networks:
   flink_kafka_net:
     driver: bridge

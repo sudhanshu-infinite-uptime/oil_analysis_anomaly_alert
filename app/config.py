@@ -158,6 +158,7 @@ class Config:
     # Trend API
     TREND_API_BASE_URL: str
     TREND_API_TOKEN: str
+    EXTERNAL_DEVICE_API_BASE_URL: str
 
     # Token-based auth
     TOKEN_URL: str
@@ -201,6 +202,7 @@ CONFIG = Config(
         "https://api.infinite-uptime.com/api/3.0/idap-api/external-monitors/trend-history"
     ),
     TREND_API_TOKEN=_env_str("TREND_API_TOKEN", ""),
+    EXTERNAL_DEVICE_API_BASE_URL=_env_str("EXTERNAL_DEVICE_API_BASE_URL", ""),
 
     # Token auth
     TOKEN_URL=_env_str("TOKEN_URL", ""),
@@ -236,6 +238,10 @@ if not CONFIG.TOKEN_USERNAME:
 
 if not CONFIG.TOKEN_PASSWORD:
     _missing.append("TOKEN_PASSWORD")
+
+if not CONFIG.EXTERNAL_DEVICE_API_BASE_URL:
+    _missing.append("EXTERNAL_DEVICE_API_BASE_URL")
+
 
 if _missing:
     raise RuntimeError(

@@ -81,8 +81,11 @@ def detect_anomalies(
             "model_metadata": metadata,
         }
 
+    monitor_id = metadata.get("monitor_id", "UNKNOWN")
+
     logger.warning(
-        "Anomalies detected | count=%d | indices=%s",
+        "Anomalies detected | MONITORID=%s | count=%d | indices=%s",
+        monitor_id,
         len(anomaly_indices),
         anomaly_indices,
     )

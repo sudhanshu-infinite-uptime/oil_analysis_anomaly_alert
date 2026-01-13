@@ -6,13 +6,11 @@ Top-level entry point for the Oil Anomaly Detection Pipeline.
 Responsibilities:
     • Initialize global logging
     • Start the Flink streaming pipeline
-    • Provide a clean, minimal entry point for running in containers
 
-This file should NOT:
-    - Load or train models
-    - Contain Flink operators
-    - Handle Kafka directly
-    - Perform sliding window logic
+Design:
+    • NO model bootstrap
+    • NO external API calls
+    • Fully event-driven (Kafka → Device → Model → Inference)
 """
 
 from __future__ import annotations
@@ -24,7 +22,14 @@ logger = get_logger(__name__)
 
 
 def main() -> None:
-    """Application entry point. Starts the Flink anomaly detection pipeline."""
+    """
+    Application entry point.
+
+    Flow:
+    - Start Flink streaming job
+    - Models are trained ON-DEMAND inside the operator
+    """
+
     logger.info("🚀 Starting Oil Anomaly Detection Service...")
     run_flink_job()
 
