@@ -1,36 +1,31 @@
 """
 app/models/model_builder.py
 
-End-to-end model training module for Oil Anomaly Detection.
+End-to-end model training module for Oil Anomaly Detection (Trend API v2).
 
-This module is responsible ONLY for model training and persistence.
-It is intentionally decoupled from Flink streaming logic.
-
-Supported training entry points:
-1. Parameter Group  → Train models for ALL MONITORIDs
-2. Device ID        → Resolve MONITORID and train ONE model
-3. Direct MONITORID → Train ONE model (used by bootstrap flows)
-
-Design principles:
+Responsibilities:
+- Train IsolationForest models
+- Persist model + scaler + metadata
 - Never crash Flink jobs
 - Fail fast and log clearly
-- Skip bad monitors instead of poisoning the pipeline
-- Single source of truth for training logic
+
+IMPORTANT (v2):
+- Training uses Trend API v2
+- deviceIdentifier is passed directly
+- parameter_group_id is NO LONGER USED
 """
 
 from __future__ import annotations
 
 import pickle
 from datetime import datetime
-from typing import Dict, Any, List, DefaultDict
-from collections import defaultdict
+from typing import Dict, Any, List
 
 import pandas as pd
 from sklearn.ensemble import IsolationForest
 from sklearn.preprocessing import RobustScaler
 
 from app.api.trend_api_client import TrendAPIClient
-from app.api.device_api_client import DeviceAPIClient
 from app.models.model_store import save_binary, save_metadata
 from app.utils.logging_utils import get_logger
 from app.config import (
@@ -42,36 +37,46 @@ from app.config import (
 
 logger = get_logger(__name__)
 
+
 # =====================================================================
-# PUBLIC ENTRYPOINT 1
-# PARAMETER GROUP → ALL MONITORS
+# PUBLIC ENTRYPOINT
+# DEVICE ID → MODEL (Trend API v2)
 # =====================================================================
-def build_model_for_parameter_group(
-    parameter_group_id: int,
+def build_model_for_device_v2(
+    device_id: str,
     start_datetime: str,
     end_datetime: str,
+    interval_value: int = 1,
+    interval_unit: str = "seconds",
 ) -> None:
     """
-    Train and persist models for ALL MONITORIDs
-    returned under a given parameter group.
+    Train and persist model using Trend API v2.
+
+    Flow:
+    deviceIdentifier → Trend API v2 → monitorId → model
     """
 
     logger.info(
-        "Model training started | parameter_group_id=%s",
-        parameter_group_id,
+        "Model training started (v2) | DEVICEID=%s",
+        device_id,
     )
 
     try:
         client = TrendAPIClient()
+
         records = client.get_history(
-            parameter_group_id=parameter_group_id,
+            device_identifier=device_id,
+            feature_codes=MODEL_FEATURE_CODES,
             start_datetime=start_datetime,
             end_datetime=end_datetime,
+            interval_value=interval_value,
+            interval_unit=interval_unit,
         )
+
     except Exception as exc:
         logger.error(
-            "Trend API failure | parameter_group_id=%s | error=%s",
-            parameter_group_id,
+            "Trend API v2 failure | DEVICEID=%s | error=%s",
+            device_id,
             exc,
             exc_info=True,
         )
@@ -79,137 +84,48 @@ def build_model_for_parameter_group(
 
     if not records:
         logger.warning(
-            "No records returned | parameter_group_id=%s",
-            parameter_group_id,
-        )
-        return
-
-    grouped: DefaultDict[int, List[Dict[str, Any]]] = defaultdict(list)
-
-    for r in records:
-        monitor_id = r.get("MONITORID")
-        params = r.get("PROCESS_PARAMETER")
-
-        if monitor_id is None or not isinstance(params, dict):
-            continue
-
-        grouped[monitor_id].append(params)
-
-    logger.info(
-        "Fetched data | parameter_group_id=%s | monitors=%d",
-        parameter_group_id,
-        len(grouped),
-    )
-
-    for monitor_id, param_rows in grouped.items():
-        _train_single_monitor(
-            monitor_id=monitor_id,
-            parameter_group_id=parameter_group_id,
-            param_rows=param_rows,
-        )
-
-# =====================================================================
-# PUBLIC ENTRYPOINT 2
-# DEVICE ID → MONITOR → MODEL
-# =====================================================================
-def build_model_for_device(
-    device_id: str,
-    parameter_group_id: int,
-    start_datetime: str,
-    end_datetime: str,
-) -> None:
-    """
-    Resolve MONITORID from DEVICE ID and train model for that monitor.
-    """
-
-    try:
-        trend_client = TrendAPIClient()
-        token = trend_client.token_manager.get_token()
-
-        device_client = DeviceAPIClient()
-        monitor_id = device_client.get_monitor_id(device_id, token)
-
-    except Exception as exc:
-        logger.error(
-            "Failed to resolve monitor from device | device=%s | error=%s",
+            "No training records returned | DEVICEID=%s",
             device_id,
-            exc,
-            exc_info=True,
         )
         return
 
-    build_model_for_monitor(
-        monitor_id=monitor_id,
-        parameter_group_id=parameter_group_id,
-        start_datetime=start_datetime,
-        end_datetime=end_datetime,
-    )
-
-# =====================================================================
-# PUBLIC ENTRYPOINT 3
-# SINGLE MONITOR
-# =====================================================================
-def build_model_for_monitor(
-    monitor_id: int,
-    parameter_group_id: int,
-    start_datetime: str,
-    end_datetime: str,
-) -> None:
-    """
-    Train and persist model for a SINGLE MONITORID.
-    """
-
-    logger.info(
-        "Model training started | MONITORID=%s | parameter_group_id=%s",
-        monitor_id,
-        parameter_group_id,
-    )
-
-    try:
-        client = TrendAPIClient()
-        records = client.get_history(
-            parameter_group_id=parameter_group_id,
-            start_datetime=start_datetime,
-            end_datetime=end_datetime,
-        )
-    except Exception as exc:
+    monitor_id = records[0].get("MONITORID")
+    if not monitor_id:
         logger.error(
-            "Trend API failure | MONITORID=%s | error=%s",
-            monitor_id,
-            exc,
-            exc_info=True,
+            "Missing MONITORID in Trend API v2 response | DEVICEID=%s",
+            device_id,
         )
         return
 
     param_rows = [
         r["PROCESS_PARAMETER"]
         for r in records
-        if r.get("MONITORID") == monitor_id
-        and isinstance(r.get("PROCESS_PARAMETER"), dict)
+        if isinstance(r.get("PROCESS_PARAMETER"), dict)
     ]
 
     if not param_rows:
-        logger.warning("No training data | MONITORID=%s", monitor_id)
+        logger.warning(
+            "No usable training rows | MONITORID=%s",
+            monitor_id,
+        )
         return
 
-    _train_single_monitor(
+    _train_single_monitor_v2(
         monitor_id=monitor_id,
-        parameter_group_id=parameter_group_id,
         param_rows=param_rows,
     )
 
+
 # =====================================================================
-# INTERNAL CORE TRAINING LOGIC
-# ONE MONITOR → ONE MODEL
+# INTERNAL CORE TRAINING LOGIC (UNCHANGED ML)
 # =====================================================================
-def _train_single_monitor(
+def _train_single_monitor_v2(
     monitor_id: int,
-    parameter_group_id: int,
     param_rows: List[Dict[str, Any]],
 ) -> None:
     """
     Core training routine.
-    This is the ONLY place where model training happens.
+    Single monitor → single model.
     """
 
     try:
@@ -260,13 +176,13 @@ def _train_single_monitor(
 
         metadata = {
             "monitor_id": monitor_id,
-            "parameter_group_id": parameter_group_id,
             "trained_at": datetime.utcnow().isoformat(),
             "algorithm": "IsolationForest",
             "feature_codes": MODEL_FEATURE_CODES,
             "feature_names": MODEL_FEATURE_NAMES_ORDERED,
             "rows_used": len(train_df),
             "scaler": "RobustScaler",
+            "trend_api": "v2",
         }
 
         save_binary(f"{monitor_id}/model.pkl", pickle.dumps(model))

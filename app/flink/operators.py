@@ -5,8 +5,8 @@ MultiModelAnomalyOperator (On-Demand Training + Inference)
 
 Responsibilities:
 - Consume Kafka records
-- Resolve deviceId → monitorId
-- Train model on-demand if missing
+- Resolve deviceId → monitorId (for runtime state & alerts)
+- Train model on-demand (Trend API v2)
 - Maintain per-monitor sliding windows
 - Run anomaly detection
 - Emit alerts
@@ -28,7 +28,7 @@ from pyflink.datastream.functions import FlatMapFunction, RuntimeContext
 from app.api.device_api_client import DeviceAPIClient
 from app.models.model_cache import ModelCache
 from app.models.model_store import model_exists
-from app.models.model_builder import build_model_for_monitor
+from app.models.model_builder import build_model_for_device_v2
 from app.predictor.anomaly_detector import detect_anomalies
 from app.windows.sliding_window import SlidingWindow
 
@@ -59,11 +59,11 @@ class MultiModelAnomalyOperator(FlatMapFunction):
             return
 
         # ---------------------------------------------------------
-        # Resolve device → monitor + parameter group
+        # Resolve device → monitor (runtime only)
         # ---------------------------------------------------------
         try:
-            monitor_id, parameter_group_id = (
-                self.device_client.get_monitor_and_pg(device_id)
+            monitor_id = self.device_client.get_monitor_id_runtime(
+                device_id
             )
         except Exception as exc:
             logger.error(
@@ -74,19 +74,17 @@ class MultiModelAnomalyOperator(FlatMapFunction):
             return
 
         # ---------------------------------------------------------
-        # Train model ON-DEMAND if missing
-        # Guarded against parallel execution
+        # Train model ON-DEMAND (Trend API v2)
         # ---------------------------------------------------------
         if not model_exists(monitor_id):
             logger.info(
-                "Model missing → training | DEVICEID=%s | MONITORID=%s",
+                "Model missing → training (v2) | DEVICEID=%s | MONITORID=%s",
                 device_id,
                 monitor_id,
             )
             try:
-                build_model_for_monitor(
-                    monitor_id=monitor_id,
-                    parameter_group_id=parameter_group_id,
+                build_model_for_device_v2(
+                    device_id=device_id,
                     start_datetime=CONFIG.TRAIN_START_TIME,
                     end_datetime=CONFIG.TRAIN_END_TIME,
                 )
@@ -98,24 +96,16 @@ class MultiModelAnomalyOperator(FlatMapFunction):
                     )
                 else:
                     logger.error(
-                        "Model training failed | MONITORID=%s | %s",
-                        monitor_id,
+                        "Model training failed | DEVICEID=%s | %s",
+                        device_id,
                         exc,
                     )
                     return
 
         # ---------------------------------------------------------
-        # Sliding window setup (with memory protection)
+        # Sliding window setup (per monitor)
         # ---------------------------------------------------------
         if monitor_id not in self.windows:
-            if len(self.windows) >= CONFIG.MAX_ACTIVE_MONITORS:
-                evicted = next(iter(self.windows))
-                self.windows.pop(evicted, None)
-                logger.warning(
-                    "Evicted sliding window | MONITORID=%s",
-                    evicted,
-                )
-
             self.windows[monitor_id] = SlidingWindow(
                 window_size=CONFIG.WINDOW_COUNT,
                 slide_size=CONFIG.SLIDE_COUNT,

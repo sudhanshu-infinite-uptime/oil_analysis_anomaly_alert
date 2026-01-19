@@ -94,7 +94,7 @@ FEATURE_MAP = {
     "001_R": "Total Non-Ferrous Particles",
 }
 
-# ✅ ONLY THESE FEATURES ARE USED FOR MODEL
+#  ONLY THESE FEATURES ARE USED FOR MODEL
 MODEL_FEATURE_CODES = [
     "001_A",
     "001_B",
@@ -104,17 +104,12 @@ MODEL_FEATURE_CODES = [
     "001_F",
 ]
 
-FEATURES = [
-    "Oil Dielectric Constant",
-    "Oil Density",
-    "Kinematic Viscosity",
-    "Moisture",
-    "Water Activity",
-    "Oil Temperature",
-]
+
+FEATURES = [FEATURE_MAP[c] for c in MODEL_FEATURE_CODES]
+
 
 # -------------------------------------------------------------------
-# 🔒 Model feature enforcement
+#  Model feature enforcement
 # -------------------------------------------------------------------
 MODEL_FEATURE_CODES_ORDERED = tuple(MODEL_FEATURE_CODES)
 
@@ -153,8 +148,6 @@ class Config:
     TRAIN_START_TIME: str
     TRAIN_END_TIME: str
 
-    # Parameter group fallback
-    DEFAULT_PARAMETER_GROUP_ID: int
 
     # Trend / Device API
     TREND_API_BASE_URL: str
@@ -208,16 +201,10 @@ CONFIG = Config(
         "2025-12-29T10:05:00.000Z",
     ),
 
-    # Parameter group
-    DEFAULT_PARAMETER_GROUP_ID=_env_int(
-        "DEFAULT_PARAMETER_GROUP_ID",
-        123,
-    ),
-
     # Trend / Device API
     TREND_API_BASE_URL=_env_str(
         "TREND_API_BASE_URL",
-        "https://api.infinite-uptime.com/api/3.0/idap-api/external-monitors/trend-history",
+        "https://api.infinite-uptime.com/api/3.0/idap-api/external-monitors/trend-history/v2",
     ),
     TREND_API_TOKEN=_env_str("TREND_API_TOKEN", ""),
     EXTERNAL_DEVICE_API_BASE_URL=_env_str(
@@ -231,7 +218,7 @@ CONFIG = Config(
     TOKEN_PASSWORD=_env_str("TOKEN_PASSWORD", ""),
 
     # AWS
-    S3_BUCKET_NAME=_env_str("S3_BUCKET_NAME", ""),
+    S3_BUCKET_NAME=_env_str("S3_BUCKET_NAME", "").strip(),
 
     # Runtime
     LOG_DIR=LOG_DIR,
@@ -242,7 +229,7 @@ CONFIG = Config(
 
 
 # -------------------------------------------------------------------
-# 🚨 Fail-fast validation
+#  Fail-fast validation
 # -------------------------------------------------------------------
 _missing = []
 
@@ -270,9 +257,6 @@ if not CONFIG.TRAIN_START_TIME:
 if not CONFIG.TRAIN_END_TIME:
     _missing.append("TRAIN_END_TIME")
 
-if not CONFIG.DEFAULT_PARAMETER_GROUP_ID:
-    _missing.append("DEFAULT_PARAMETER_GROUP_ID")
-
 if _missing:
     raise RuntimeError(
         "Missing required environment variables: "
@@ -281,7 +265,7 @@ if _missing:
 
 
 # -------------------------------------------------------------------
-# 🚨 Feature sanity checks
+#  Feature sanity checks
 # -------------------------------------------------------------------
 if len(MODEL_FEATURE_CODES) != 6:
     raise RuntimeError(

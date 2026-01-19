@@ -16,9 +16,9 @@ class DeviceAPIClient:
         self.base_url = CONFIG.EXTERNAL_DEVICE_API_BASE_URL
         self.token_manager = TokenManager()
 
-    # ------------------------------------------------------------------
-    # EXISTING METHOD (DO NOT BREAK)
-    # ------------------------------------------------------------------
+    # --------------------------------------------------
+    # Legacy method (do not break)
+    # --------------------------------------------------
     def get_monitor_id(self, device_id: str, token: str) -> int:
         url = f"{self.base_url}/external-devices/{device_id}/parameters"
 
@@ -28,66 +28,51 @@ class DeviceAPIClient:
         }
 
         response = requests.get(url, headers=headers, timeout=20)
-
         if response.status_code != 200:
             raise APICallError(url, response.status_code, response.text)
 
         payload = response.json()
+        monitor_id = (payload.get("data") or {}).get("monitorId")
 
-        monitor_id = payload.get("monitorId")
         if not monitor_id:
-            raise RuntimeError(f"No monitorId returned for device {device_id}")
+            raise RuntimeError(
+                f"Missing monitorId | DEVICEID={device_id} | response={payload}"
+            )
 
         logger.info(
             "Resolved device → monitor | DEVICEID=%s | MONITORID=%s",
             device_id,
             monitor_id,
         )
-
         return int(monitor_id)
 
-    # ------------------------------------------------------------------
-    # NEW METHOD (USED BY FLINK OPERATOR)
-    # ------------------------------------------------------------------
-    def get_monitor_and_pg(self, device_id: str):
-        """
-        Resolve DEVICEID → (MONITORID, PARAMETER_GROUP_ID)
-
-        Safe for streaming:
-        - Token is cached
-        - No blocking filesystem calls
-        - No shared mutable state
-        """
-
+    # --------------------------------------------------
+    # Runtime-safe method (USED BY FLINK)
+    # --------------------------------------------------
+    def get_monitor_id_runtime(self, device_id: str) -> int:
         token = self.token_manager.get_token()
 
         url = f"{self.base_url}/external-devices/{device_id}/parameters"
-
         headers = {
             "Authorization": f"Bearer {token}",
             "Accept": "application/json",
         }
 
         response = requests.get(url, headers=headers, timeout=20)
-
         if response.status_code != 200:
             raise APICallError(url, response.status_code, response.text)
 
         payload = response.json()
+        monitor_id = (payload.get("data") or {}).get("monitorId")
 
-        monitor_id = payload.get("monitorId")
-        parameter_group_id = payload.get("parameterGroupId")
-
-        if not monitor_id or not parameter_group_id:
+        if not monitor_id:
             raise RuntimeError(
-                f"Incomplete device mapping | DEVICEID={device_id} | response={payload}"
+                f"Missing monitorId | DEVICEID={device_id} | response={payload}"
             )
 
         logger.info(
-            "Resolved device → monitor + pg | DEVICEID=%s | MONITORID=%s | PGID=%s",
+            "Resolved device → monitor | DEVICEID=%s | MONITORID=%s",
             device_id,
             monitor_id,
-            parameter_group_id,
         )
-
-        return int(monitor_id), int(parameter_group_id)
+        return int(monitor_id)

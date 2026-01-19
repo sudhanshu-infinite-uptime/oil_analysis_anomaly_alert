@@ -1,0 +1,56 @@
+2026-01-13 21:02:40,734 | INFO | app.api.trend_api_client | Fetching trend history | parameter_group_id=123
+2026-01-13 21:02:58,972 | INFO | app.api.trend_api_client | Fetching trend history | parameter_group_id=123
+2026-01-13 21:09:29,108 | INFO | app.api.trend_api_client | Fetching trend history | parameter_group_id=123
+2026-01-13 21:18:07,277 | INFO | app.api.trend_api_client | Fetching trend history | MONITORID=35
+2026-01-13 21:21:49,360 | INFO | app.api.trend_api_client | Fetching trend history | MONITORID=35
+2026-01-13 21:39:47,791 | INFO | app.api.trend_api_client | Fetching trend history | parameter_group_id=90
+2026-01-13 21:39:49,923 | INFO | app.api.trend_api_client | Trend API success | monitors=1 | records=119
+2026-01-13 22:53:44,378 | INFO | app.api.trend_api_client | Fetching trend history | DEVICEID=AA:BB:CC:XX:YY:13
+2026-01-13 22:53:45,465 | INFO | app.api.trend_api_client | Trend API v2 success | MONITORID=263 | records=693
+2026-01-13 23:13:50,666 | INFO | app.api.trend_api_client | Fetching trend history | DEVICEID=AA:BB:CC:XX:YY:13
+2026-01-13 23:13:51,704 | INFO | app.api.trend_api_client | Trend API v2 success | MONITORID=263 | records=693
+2026-01-13 23:26:53,749 | INFO | app.api.trend_api_client | Fetching trend history | DEVICEID=AA:BB:CC:XX:YY:13
+2026-01-13 23:26:54,431 | INFO | app.api.trend_api_client | Trend API v2 success | MONITORID=263 | records=693
+2026-01-13 23:29:27,812 | INFO | app.api.trend_api_client | Fetching trend history | DEVICEID=AA:BB:CC:XX:YY:13
+2026-01-13 23:29:28,391 | INFO | app.api.trend_api_client | Trend API v2 success | MONITORID=263 | records=693
+2026-01-13 23:31:22,387 | INFO | app.api.trend_api_client | Fetching trend history | DEVICEID=AA:BB:CC:XX:YY:13
+2026-01-13 23:31:23,298 | INFO | app.api.trend_api_client | Trend API v2 success | MONITORID=263 | records=693
+2026-01-13 23:49:44,513 | INFO | app.api.trend_api_client | Fetching trend history | DEVICEID=AA:BB:CC:XX:YY:13
+2026-01-13 23:49:45,191 | INFO | app.api.trend_api_client | Trend API v2 success | MONITORID=263 | records=693
+2026-01-13 23:49:59,080 | INFO | app.api.trend_api_client | Fetching trend history | DEVICEID=AA:BB:CC:XX:YY:13
+2026-01-13 23:49:59,695 | INFO | app.api.trend_api_client | Trend API v2 success | MONITORID=263 | records=693
+2026-01-16 11:37:13,201 | INFO | app.api.trend_api_client | Fetching trend history | DEVICEID=AA:BB:CC:XX:YY:13
+2026-01-16 11:37:16,090 | INFO | app.api.trend_api_client | Trend API v2 success | MONITORID=23 | records=661
+2026-01-16 11:38:28,491 | INFO | app.api.trend_api_client | Fetching trend history | DEVICEID=AA:BB:CC:XX:YY:13
+2026-01-16 11:38:31,692 | INFO | app.api.trend_api_client | Trend API v2 success | MONITORID=23 | records=661
+2026-01-16 11:42:30,501 | INFO | app.api.trend_api_client | Fetching trend history | DEVICEID=AA:BB:CC:XX:YY:13
+2026-01-16 11:42:32,624 | INFO | app.api.trend_api_client | Trend API v2 success | MONITORID=23 | records=661
+2026-01-16 11:43:04,135 | INFO | app.api.trend_api_client | Fetching trend history | DEVICEID=AA:BB:CC:XX:YY:13
+2026-01-16 11:43:07,540 | INFO | app.api.trend_api_client | Trend API v2 success | MONITORID=23 | records=661
+2026-01-16 11:43:51,606 | INFO | app.api.trend_api_client | Fetching trend history | DEVICEID=AA:BB:CC:XX:YY:13
+2026-01-16 11:43:54,106 | INFO | app.api.trend_api_client | Trend API v2 success | MONITORID=23 | records=661
+2026-01-16 11:44:01,633 | INFO | app.api.trend_api_client | Fetching trend history | DEVICEID=AA:BB:CC:XX:YY:13
+2026-01-16 11:44:03,706 | INFO | app.api.trend_api_client | Trend API v2 success | MONITORID=23 | records=661
+2026-01-16 11:58:28,961 | INFO | app.api.trend_api_client | Fetching trend history | DEVICEID=AA:BB:CC:XX:YY:13
+2026-01-16 11:58:31,128 | INFO | app.api.trend_api_client | Trend API v2 success | MONITORID=23 | records=661
+2026-01-16 11:58:53,885 | INFO | app.api.trend_api_client | Fetching trend history | DEVICEID=AA:BB:CC:XX:YY:13
+2026-01-16 11:59:00,874 | INFO | app.api.trend_api_client | Fetching trend history | DEVICEID=AA:BB:CC:XX:YY:13
+2026-01-16 11:59:03,024 | INFO | app.api.trend_api_client | Trend API v2 success | MONITORID=23 | records=661
+2026-01-16 12:01:18,297 | INFO | app.api.trend_api_client | Fetching trend history | DEVICEID=AA:BB:CC:XX:YY:13
+2026-01-16 12:01:20,458 | INFO | app.api.trend_api_client | Trend API v2 success | MONITORID=23 | records=661
+2026-01-19 13:02:19,923 | INFO | app.api.trend_api_client | Fetching trend history | DEVICEID=AA:BB:CC:XX:YY:13
+2026-01-19 13:02:22,098 | INFO | app.api.trend_api_client | Trend API v2 success | MONITORID=23 | records=661
+2026-01-19 13:05:30,227 | INFO | app.api.trend_api_client | Fetching trend history | DEVICEID=AA:BB:CC:XX:YY:13
+2026-01-19 13:05:32,414 | INFO | app.api.trend_api_client | Trend API v2 success | MONITORID=23 | records=661
+2026-01-19 13:05:50,089 | INFO | app.api.trend_api_client | Fetching trend history | DEVICEID=AA:BB:CC:XX:YY:13
+2026-01-19 13:05:52,125 | INFO | app.api.trend_api_client | Trend API v2 success | MONITORID=23 | records=661
+2026-01-19 13:05:58,294 | INFO | app.api.trend_api_client | Fetching trend history | DEVICEID=AA:BB:CC:XX:YY:13
+2026-01-19 13:06:00,314 | INFO | app.api.trend_api_client | Trend API v2 success | MONITORID=23 | records=661
+2026-01-19 13:14:24,842 | INFO | app.api.trend_api_client | Fetching trend history | DEVICEID=AA:BB:CC:XX:YY:13
+2026-01-19 13:14:26,713 | INFO | app.api.trend_api_client | Trend API v2 success | MONITORID=23 | records=119
+2026-01-19 13:21:36,201 | INFO | app.api.trend_api_client | Fetching trend history | DEVICEID=AA:BB:CC:XX:YY:13
+2026-01-19 13:21:38,146 | INFO | app.api.trend_api_client | Trend API v2 success | MONITORID=23 | records=119
+2026-01-19 13:34:46,865 | INFO | app.api.trend_api_client | Fetching trend history | DEVICEID=AA:BB:CC:XX:YY:13
+2026-01-19 13:34:48,696 | INFO | app.api.trend_api_client | Trend API v2 success | MONITORID=23 | records=119
+2026-01-19 14:07:30,808 | INFO | app.api.trend_api_client | Fetching trend history | DEVICEID=AA:BB:CC:XX:YY:13
+2026-01-19 14:07:32,709 | INFO | app.api.trend_api_client | Trend API v2 success | MONITORID=23 | records=119

@@ -1,13 +1,13 @@
 """
 app/api/trend_api_client.py
 
-Production-ready HTTP client for fetching historical trend data
-used during model training.
+Production-ready client for Trend API v2.
 
-IMPORTANT:
-- externalDeviceParameterGroupIds is REQUIRED
-- monitorId is returned by the API, not supplied
-- ALL monitorIds returned by the API are processed
+Key behavior (FINAL CONTRACT):
+- Input  : deviceIdentifier (from live data)
+- Output : ONE monitor trend (already resolved by backend)
+- No dependency on External Device API
+- No parameterGroupId required
 """
 
 from __future__ import annotations
@@ -25,15 +25,17 @@ from app.utils.exceptions import APICallError
 logger = get_logger(__name__)
 
 
-# -------------------------------------------------------------------
-# Trend API Client
-# -------------------------------------------------------------------
 class TrendAPIClient:
     """
-    Client wrapper for Infinite Uptime Trend History API.
+    Trend API v2 client.
 
-    Input  : externalDeviceParameterGroupId
-    Output : multiple monitorIds (derived from API)
+    Backend responsibilities:
+    - Resolve deviceIdentifier → monitorId
+    - Return single monitor trend data
+
+    This client:
+    - Sends deviceIdentifier
+    - Normalizes response into internal format
     """
 
     def __init__(self) -> None:
@@ -46,12 +48,23 @@ class TrendAPIClient:
 
     def get_history(
         self,
-        parameter_group_id: int,
+        device_identifier: str,
+        feature_codes: List[str],
         start_datetime: str,
         end_datetime: str,
-        interval_value: int = 6,
-        interval_unit: str = "hour",
+        interval_value: int,
+        interval_unit: str,
     ) -> List[Dict[str, Any]]:
+        """
+        Fetch trend history using deviceIdentifier (Trend API v2).
+
+        Returns normalized records:
+        {
+            "MONITORID": int,
+            "PROCESS_PARAMETER": {...},
+            "timestamp": str
+        }
+        """
 
         token = self.token_manager.get_token()
 
@@ -66,12 +79,13 @@ class TrendAPIClient:
             "endDateTime": end_datetime,
             "intervalValue": interval_value,
             "intervalUnit": interval_unit,
-            "externalDeviceParameterGroupIds": [int(parameter_group_id)],
+            "deviceIdentifier": device_identifier,
+            "featureCodes": feature_codes,
         }
 
         logger.info(
-            "Fetching trend history | parameter_group_id=%s",
-            parameter_group_id,
+            "Fetching trend history | DEVICEID=%s",
+            device_identifier,
         )
 
         try:
@@ -111,39 +125,47 @@ class TrendAPIClient:
                 f"Invalid JSON response: {exc}",
             )
 
-        monitors = payload_json.get("data", {}).get("monitors", [])
-        if not monitors:
+        monitor_trend = (
+            payload_json
+            .get("data", {})
+            .get("monitorTrend")
+        )
+
+        if not monitor_trend:
             raise APICallError(
                 self.base_url,
                 200,
-                "No monitors returned by Trend API",
+                "No monitorTrend returned by Trend API v2",
+            )
+
+        monitor_id = monitor_trend.get("monitorId")
+        readings = monitor_trend.get("readings", [])
+
+        if not monitor_id or not readings:
+            raise APICallError(
+                self.base_url,
+                200,
+                "Missing monitorId or readings in Trend API v2 response",
             )
 
         normalized: List[Dict[str, Any]] = []
 
-        for monitor in monitors:
-            monitor_id = monitor.get("monitorId")
-            readings = monitor.get("readings", [])
-
-            if not readings:
+        for r in readings:
+            try:
+                raw = json.loads(r.get("jsonavg", "{}"))
+            except Exception:
                 continue
 
-            for r in readings:
-                try:
-                    raw = json.loads(r["jsonavg"])
-                except Exception:
-                    continue
-
-                normalized.append(
-                    {
-                        "MONITORID": monitor_id,
-                        "PROCESS_PARAMETER": {
-                            k: float(v) if v not in (None, "", "null") else None
-                            for k, v in raw.items()
-                        },
-                        "timestamp": r.get("time"),
-                    }
-                )
+            normalized.append(
+                {
+                    "MONITORID": monitor_id,
+                    "PROCESS_PARAMETER": {
+                        k: float(v) if v not in (None, "", "null") else None
+                        for k, v in raw.items()
+                    },
+                    "timestamp": r.get("time"),
+                }
+            )
 
         if not normalized:
             raise APICallError(
@@ -153,8 +175,8 @@ class TrendAPIClient:
             )
 
         logger.info(
-            "Trend API success | monitors=%d | records=%d",
-            len({r["MONITORID"] for r in normalized}),
+            "Trend API v2 success | MONITORID=%s | records=%d",
+            monitor_id,
             len(normalized),
         )
 
