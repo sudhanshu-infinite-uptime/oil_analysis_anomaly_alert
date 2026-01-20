@@ -1,31 +1,25 @@
 """
 app/models/model_cache.py
 
-In-memory LRU cache for storing trained model bundles used during inference.
+In-memory LRU cache for trained model bundles.
 
-Each cache entry contains:
-- IsolationForest model
-- RobustScaler
-- metadata dictionary
+Responsibilities:
+- Cache (model, scaler, metadata) per MONITORID
+- Reduce repeated S3 reads during streaming inference
+- Enforce thread-safe access for Flink operators
 
-Purpose:
-- Avoid repeated S3 reads during Flink stream processing
-- Improve latency and throughput
-
-Notes:
-- Cache is per Python process (per TaskManager worker)
-- Thread-safe for concurrent operator access
-
-Used by:
-- flink/operators.py
-- anomaly_detector.py
+This module does NOT:
+- Train models
+- Retry failed loads
+- Perform inference
+- Handle persistence
 """
 
 from __future__ import annotations
 
 from collections import OrderedDict
-from typing import Any, Dict, Tuple
 from threading import Lock
+from typing import Any, Dict, Tuple
 
 from app.config import CONFIG
 from app.models.model_loader import load_model_bundle
@@ -38,66 +32,79 @@ class ModelCache:
     """
     Thread-safe LRU cache for model bundles.
 
-    API:
-        get(monitor_id) -> (model, scaler, metadata)
-        clear() -> None
+    Cache key:
+        monitor_id (int)
+
+    Cache value:
+        (model, scaler, metadata)
     """
 
     def __init__(self, max_size: int | None = None):
         self.max_size = max_size or CONFIG.MODEL_CACHE_SIZE
-        self.cache: OrderedDict[str, Tuple[Any, Any, Dict]] = OrderedDict()
+        self._cache: OrderedDict[int, Tuple[Any, Any, Dict]] = OrderedDict()
         self._lock = Lock()
 
         logger.info(
-            "ModelCache initialized | max_size=%d | id=%s",
+            "ModelCache initialized | max_size=%d | instance=%s",
             self.max_size,
             hex(id(self)),
         )
 
-    # ------------------------------------------------------------------
-    # Retrieve model bundle (cache-first)
-    # ------------------------------------------------------------------
-    def get(self, monitor_id: str) -> Tuple[Any, Any, Dict]:
+    # ------------------------------------------------------------
+    # Public API
+    # ------------------------------------------------------------
+    def get(self, monitor_id: int) -> Tuple[Any, Any, Dict]:
         """
-        Retrieve model bundle for MONITORID.
+        Retrieve model bundle for a monitor.
 
-        Loads from S3 if not present in cache.
+        Behavior:
+        - Cache HIT  → return immediately
+        - Cache MISS → load from S3 → insert → return
 
         Raises:
             ModelNotFoundError
             ModelLoadError
         """
 
+        # ---------- fast path (cache hit)
         with self._lock:
-            if monitor_id in self.cache:
-                bundle = self.cache.pop(monitor_id)
-                self.cache[monitor_id] = bundle
-                logger.debug("ModelCache HIT | MONITORID=%s", monitor_id)
+            bundle = self._cache.get(monitor_id)
+            if bundle is not None:
+                # refresh LRU order
+                self._cache.move_to_end(monitor_id)
+                logger.debug(
+                    "ModelCache HIT | MONITORID=%s | cache_size=%d",
+                    monitor_id,
+                    len(self._cache),
+                )
                 return bundle
 
-        logger.info("ModelCache MISS | Loading model | MONITORID=%s", monitor_id)
+        logger.info("ModelCache MISS | MONITORID=%s | loading from S3", monitor_id)
 
-        # Load outside lock (S3/network I/O)
+        # ---------- slow path (S3 load outside lock)
         bundle = load_model_bundle(monitor_id)
 
+        # ---------- insert into cache
         with self._lock:
-            self.cache[monitor_id] = bundle
+            # another thread may have loaded it already
+            if monitor_id in self._cache:
+                self._cache.move_to_end(monitor_id)
+                return self._cache[monitor_id]
 
-            if len(self.cache) > self.max_size:
-                evicted_id, _ = self.cache.popitem(last=False)
+            self._cache[monitor_id] = bundle
+
+            if len(self._cache) > self.max_size:
+                evicted_id, _ = self._cache.popitem(last=False)
                 logger.warning(
                     "ModelCache EVICT | MONITORID=%s | cache_size=%d",
                     evicted_id,
-                    len(self.cache),
+                    len(self._cache),
                 )
 
         return bundle
 
-    # ------------------------------------------------------------------
-    # Clear cache
-    # ------------------------------------------------------------------
     def clear(self) -> None:
-        """Clear all cached models."""
+        """Clear all cached model bundles."""
         with self._lock:
-            self.cache.clear()
+            self._cache.clear()
         logger.info("ModelCache cleared")

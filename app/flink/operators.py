@@ -1,37 +1,17 @@
-"""
-app/flink/operators.py
-
-MultiModelAnomalyOperator (On-Demand Training + Inference)
-
-Responsibilities:
-- Consume Kafka records
-- Resolve deviceId → monitorId (for runtime state & alerts)
-- Train model on-demand (Trend API v2)
-- Maintain per-monitor sliding windows
-- Run anomaly detection
-- Emit alerts
-
-Design:
-- Event-driven
-- No startup bootstrap
-- Safe for streaming systems
-"""
-
 from __future__ import annotations
 
 import json
-import pandas as pd
 from typing import Dict, Any
 
+import pandas as pd
 from pyflink.datastream.functions import FlatMapFunction, RuntimeContext
 
 from app.api.device_api_client import DeviceAPIClient
 from app.models.model_cache import ModelCache
 from app.models.model_store import model_exists
-from app.models.model_builder import build_model_for_device_v2
+from app.models.model_builder import build_model_for_device_v2, ModelTrainingFailed
 from app.predictor.anomaly_detector import detect_anomalies
 from app.windows.sliding_window import SlidingWindow
-
 from app.utils.json_utils import safe_json_parse
 from app.utils.logging_utils import get_logger
 from app.config import CONFIG
@@ -44,11 +24,11 @@ class MultiModelAnomalyOperator(FlatMapFunction):
     def open(self, runtime_context: RuntimeContext):
         logger.info("Initializing MultiModelAnomalyOperator")
 
+        self.device_client = DeviceAPIClient()
         self.model_cache = ModelCache(max_size=CONFIG.MODEL_CACHE_SIZE)
         self.windows: Dict[int, SlidingWindow] = {}
-        self.device_client = DeviceAPIClient()
+        self.training_state: Dict[int, str] = {}
 
-    # ------------------------------------------------------------------
     def flat_map(self, value: str):
         record = safe_json_parse(value)
         if not record:
@@ -58,13 +38,8 @@ class MultiModelAnomalyOperator(FlatMapFunction):
         if not device_id:
             return
 
-        # ---------------------------------------------------------
-        # Resolve device → monitor (runtime only)
-        # ---------------------------------------------------------
         try:
-            monitor_id = self.device_client.get_monitor_id_runtime(
-                device_id
-            )
+            monitor_id = self.device_client.get_monitor_id_runtime(device_id)
         except Exception as exc:
             logger.error(
                 "Device resolution failed | DEVICEID=%s | %s",
@@ -73,38 +48,52 @@ class MultiModelAnomalyOperator(FlatMapFunction):
             )
             return
 
-        # ---------------------------------------------------------
-        # Train model ON-DEMAND (Trend API v2)
-        # ---------------------------------------------------------
-        if not model_exists(monitor_id):
-            logger.info(
-                "Model missing → training (v2) | DEVICEID=%s | MONITORID=%s",
-                device_id,
-                monitor_id,
-            )
-            try:
-                build_model_for_device_v2(
-                    device_id=device_id,
-                    start_datetime=CONFIG.TRAIN_START_TIME,
-                    end_datetime=CONFIG.TRAIN_END_TIME,
+        state = self.training_state.get(monitor_id, "NOT_STARTED")
+
+        if state == "READY":
+            pass
+
+        elif state in ("FAILED", "IN_PROGRESS"):
+            return
+
+        elif state == "NOT_STARTED":
+            if model_exists(monitor_id):
+                self.training_state[monitor_id] = "READY"
+            else:
+                self.training_state[monitor_id] = "IN_PROGRESS"
+                logger.info(
+                    "Model missing → training ONCE | DEVICEID=%s | MONITORID=%s",
+                    device_id,
+                    monitor_id,
                 )
-            except Exception as exc:
-                if model_exists(monitor_id):
-                    logger.info(
-                        "Model already created by parallel task | MONITORID=%s",
-                        monitor_id,
+                try:
+                    build_model_for_device_v2(
+                        device_id=device_id,
+                        start_datetime=CONFIG.TRAIN_START_TIME,
+                        end_datetime=CONFIG.TRAIN_END_TIME,
                     )
-                else:
+                    if model_exists(monitor_id):
+                        self.training_state[monitor_id] = "READY"
+                        logger.info(
+                            "Model training successful | MONITORID=%s",
+                            monitor_id,
+                        )
+                    else:
+                        self.training_state[monitor_id] = "FAILED"
+                        logger.error(
+                            "Training finished but model missing | MONITORID=%s",
+                            monitor_id,
+                        )
+                        return
+                except ModelTrainingFailed as exc:
+                    self.training_state[monitor_id] = "FAILED"
                     logger.error(
-                        "Model training failed | DEVICEID=%s | %s",
-                        device_id,
+                        "Model training failed permanently | MONITORID=%s | %s",
+                        monitor_id,
                         exc,
                     )
                     return
 
-        # ---------------------------------------------------------
-        # Sliding window setup (per monitor)
-        # ---------------------------------------------------------
         if monitor_id not in self.windows:
             self.windows[monitor_id] = SlidingWindow(
                 window_size=CONFIG.WINDOW_COUNT,
@@ -117,9 +106,6 @@ class MultiModelAnomalyOperator(FlatMapFunction):
         if not window.is_full():
             return
 
-        # ---------------------------------------------------------
-        # Load model
-        # ---------------------------------------------------------
         try:
             model, scaler, metadata = self.model_cache.get(monitor_id)
         except Exception as exc:
@@ -131,13 +117,10 @@ class MultiModelAnomalyOperator(FlatMapFunction):
             window.slide()
             return
 
-        # ---------------------------------------------------------
-        # Prepare data
-        # ---------------------------------------------------------
         feature_names = metadata.get("feature_names")
         if not feature_names:
             logger.error(
-                "Invalid metadata | MONITORID=%s",
+                "Invalid model metadata | MONITORID=%s",
                 monitor_id,
             )
             window.slide()
@@ -146,9 +129,6 @@ class MultiModelAnomalyOperator(FlatMapFunction):
         df = window.to_dataframe()
         df = self._align_features(df, feature_names)
 
-        # ---------------------------------------------------------
-        # Inference
-        # ---------------------------------------------------------
         try:
             result = detect_anomalies(df, model, scaler, metadata)
         except Exception as exc:
@@ -163,22 +143,24 @@ class MultiModelAnomalyOperator(FlatMapFunction):
         window.slide()
 
         if result.get("is_anomaly"):
-            logger.warning(
-                "Anomaly detected | MONITORID=%s",
-                monitor_id,
-            )
             yield json.dumps(self._format_alert(monitor_id, result))
 
-    # ------------------------------------------------------------------
-    def _align_features(self, df: pd.DataFrame, feature_names: list) -> pd.DataFrame:
+    def _align_features(
+        self,
+        df: pd.DataFrame,
+        feature_names: list,
+    ) -> pd.DataFrame:
         for col in feature_names:
             if col not in df.columns:
                 df[col] = 0.0
             df[col] = df[col].astype(float)
         return df[feature_names]
 
-    # ------------------------------------------------------------------
-    def _format_alert(self, monitor_id: int, result: Dict[str, Any]) -> Dict[str, Any]:
+    def _format_alert(
+        self,
+        monitor_id: int,
+        result: Dict[str, Any],
+    ) -> Dict[str, Any]:
         return {
             "monitorId": monitor_id,
             "isAnomaly": True,

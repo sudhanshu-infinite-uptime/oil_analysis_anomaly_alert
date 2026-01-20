@@ -16,6 +16,8 @@ import json
 from typing import List, Dict, Any
 
 import requests
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
 
 from app.config import CONFIG
 from app.api.token_manager import TokenManager
@@ -27,25 +29,35 @@ logger = get_logger(__name__)
 
 class TrendAPIClient:
     """
-    Trend API v2 client.
+    Production-ready Trend API v2 client.
 
-    Backend responsibilities:
-    - Resolve deviceIdentifier → monitorId
-    - Return single monitor trend data
-
-    This client:
-    - Sends deviceIdentifier
-    - Normalizes response into internal format
+    Contract:
+    - Input  : deviceIdentifier
+    - Output : ONE monitor trend (backend-resolved)
+    - Used ONLY for training
     """
 
     def __init__(self) -> None:
         if not CONFIG.TREND_API_BASE_URL:
             raise RuntimeError("TREND_API_BASE_URL is not configured")
 
-        self.base_url: str = CONFIG.TREND_API_BASE_URL
-        self.timeout: int = 30
+        self.base_url = CONFIG.TREND_API_BASE_URL
+        self.timeout = 30
         self.token_manager = TokenManager()
 
+        # Session with limited retries (SAFE for training)
+        self.session = requests.Session()
+        retries = Retry(
+            total=2,
+            backoff_factor=0.5,
+            status_forcelist=(500, 502, 503, 504),
+            allowed_methods=("POST",),
+            raise_on_status=False,
+        )
+        self.session.mount("https://", HTTPAdapter(max_retries=retries))
+        self.session.mount("http://", HTTPAdapter(max_retries=retries))
+
+    # ------------------------------------------------------------------
     def get_history(
         self,
         device_identifier: str,
@@ -55,23 +67,13 @@ class TrendAPIClient:
         interval_value: int,
         interval_unit: str,
     ) -> List[Dict[str, Any]]:
-        """
-        Fetch trend history using deviceIdentifier (Trend API v2).
-
-        Returns normalized records:
-        {
-            "MONITORID": int,
-            "PROCESS_PARAMETER": {...},
-            "timestamp": str
-        }
-        """
 
         token = self.token_manager.get_token()
 
         headers = {
             "Authorization": f"Bearer {token}",
             "Content-Type": "application/json",
-            "Accept": "*/*",
+            "Accept": "application/json",
         }
 
         payload = {
@@ -84,12 +86,14 @@ class TrendAPIClient:
         }
 
         logger.info(
-            "Fetching trend history | DEVICEID=%s",
+            "Fetching trend history (v2) | DEVICEID=%s | window=%s → %s",
             device_identifier,
+            start_datetime,
+            end_datetime,
         )
 
         try:
-            response = requests.post(
+            response = self.session.post(
                 self.base_url,
                 headers=headers,
                 json=payload,
@@ -100,7 +104,7 @@ class TrendAPIClient:
                 self.base_url,
                 -1,
                 f"HTTP request failed: {exc}",
-            )
+            ) from exc
 
         if response.status_code == 401:
             raise APICallError(
@@ -113,7 +117,7 @@ class TrendAPIClient:
             raise APICallError(
                 self.base_url,
                 response.status_code,
-                response.text,
+                response.text[:500],
             )
 
         try:
@@ -121,16 +125,11 @@ class TrendAPIClient:
         except Exception as exc:
             raise APICallError(
                 self.base_url,
-                response.status_code,
+                200,
                 f"Invalid JSON response: {exc}",
-            )
+            ) from exc
 
-        monitor_trend = (
-            payload_json
-            .get("data", {})
-            .get("monitorTrend")
-        )
-
+        monitor_trend = payload_json.get("data", {}).get("monitorTrend")
         if not monitor_trend:
             raise APICallError(
                 self.base_url,
@@ -139,7 +138,7 @@ class TrendAPIClient:
             )
 
         monitor_id = monitor_trend.get("monitorId")
-        readings = monitor_trend.get("readings", [])
+        readings = monitor_trend.get("readings") or []
 
         if not monitor_id or not readings:
             raise APICallError(
@@ -171,7 +170,7 @@ class TrendAPIClient:
             raise APICallError(
                 self.base_url,
                 200,
-                "Trend data parsing produced no usable records",
+                "Trend API v2 returned no usable records",
             )
 
         logger.info(

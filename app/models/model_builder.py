@@ -1,20 +1,3 @@
-"""
-app/models/model_builder.py
-
-End-to-end model training module for Oil Anomaly Detection (Trend API v2).
-
-Responsibilities:
-- Train IsolationForest models
-- Persist model + scaler + metadata
-- Never crash Flink jobs
-- Fail fast and log clearly
-
-IMPORTANT (v2):
-- Training uses Trend API v2
-- deviceIdentifier is passed directly
-- parameter_group_id is NO LONGER USED
-"""
-
 from __future__ import annotations
 
 import pickle
@@ -26,7 +9,7 @@ from sklearn.ensemble import IsolationForest
 from sklearn.preprocessing import RobustScaler
 
 from app.api.trend_api_client import TrendAPIClient
-from app.models.model_store import save_binary, save_metadata
+from app.models.model_store import save_binary, save_metadata, mark_model_success
 from app.utils.logging_utils import get_logger
 from app.config import (
     CONFIG,
@@ -38,10 +21,10 @@ from app.config import (
 logger = get_logger(__name__)
 
 
-# =====================================================================
-# PUBLIC ENTRYPOINT
-# DEVICE ID → MODEL (Trend API v2)
-# =====================================================================
+class ModelTrainingFailed(Exception):
+    pass
+
+
 def build_model_for_device_v2(
     device_id: str,
     start_datetime: str,
@@ -49,12 +32,6 @@ def build_model_for_device_v2(
     interval_value: int = 1,
     interval_unit: str = "seconds",
 ) -> None:
-    """
-    Train and persist model using Trend API v2.
-
-    Flow:
-    deviceIdentifier → Trend API v2 → monitorId → model
-    """
 
     logger.info(
         "Model training started (v2) | DEVICEID=%s",
@@ -63,7 +40,6 @@ def build_model_for_device_v2(
 
     try:
         client = TrendAPIClient()
-
         records = client.get_history(
             device_identifier=device_id,
             feature_codes=MODEL_FEATURE_CODES,
@@ -72,30 +48,19 @@ def build_model_for_device_v2(
             interval_value=interval_value,
             interval_unit=interval_unit,
         )
-
     except Exception as exc:
-        logger.error(
-            "Trend API v2 failure | DEVICEID=%s | error=%s",
-            device_id,
-            exc,
-            exc_info=True,
-        )
-        return
+        raise ModelTrainingFailed("Trend API v2 call failed") from exc
 
     if not records:
-        logger.warning(
-            "No training records returned | DEVICEID=%s",
-            device_id,
+        raise ModelTrainingFailed(
+            f"No training records returned | DEVICEID={device_id}"
         )
-        return
 
     monitor_id = records[0].get("MONITORID")
     if not monitor_id:
-        logger.error(
-            "Missing MONITORID in Trend API v2 response | DEVICEID=%s",
-            device_id,
+        raise ModelTrainingFailed(
+            f"Missing MONITORID in Trend API v2 response | DEVICEID={device_id}"
         )
-        return
 
     param_rows = [
         r["PROCESS_PARAMETER"]
@@ -104,11 +69,9 @@ def build_model_for_device_v2(
     ]
 
     if not param_rows:
-        logger.warning(
-            "No usable training rows | MONITORID=%s",
-            monitor_id,
+        raise ModelTrainingFailed(
+            f"No usable training rows | MONITORID={monitor_id}"
         )
-        return
 
     _train_single_monitor_v2(
         monitor_id=monitor_id,
@@ -116,25 +79,12 @@ def build_model_for_device_v2(
     )
 
 
-# =====================================================================
-# INTERNAL CORE TRAINING LOGIC (UNCHANGED ML)
-# =====================================================================
 def _train_single_monitor_v2(
     monitor_id: int,
     param_rows: List[Dict[str, Any]],
 ) -> None:
-    """
-    Core training routine.
-    Single monitor → single model.
-    """
 
     try:
-        logger.info(
-            "Training model | MONITORID=%s | raw_rows=%d",
-            monitor_id,
-            len(param_rows),
-        )
-
         rows: List[Dict[str, Any]] = []
 
         for params in param_rows:
@@ -148,20 +98,16 @@ def _train_single_monitor_v2(
                 rows.append(filtered)
 
         if not rows:
-            logger.warning(
-                "No valid rows after feature validation | MONITORID=%s",
-                monitor_id,
+            raise ModelTrainingFailed(
+                f"No valid rows after feature validation | MONITORID={monitor_id}"
             )
-            return
 
         train_df = pd.DataFrame(rows)[MODEL_FEATURE_NAMES_ORDERED]
 
         if train_df.empty:
-            logger.warning(
-                "Empty training DataFrame | MONITORID=%s",
-                monitor_id,
+            raise ModelTrainingFailed(
+                f"Empty training DataFrame | MONITORID={monitor_id}"
             )
-            return
 
         scaler = RobustScaler()
         X_scaled = scaler.fit_transform(train_df)
@@ -183,11 +129,13 @@ def _train_single_monitor_v2(
             "rows_used": len(train_df),
             "scaler": "RobustScaler",
             "trend_api": "v2",
+            "training_status": "SUCCESS",
         }
 
         save_binary(f"{monitor_id}/model.pkl", pickle.dumps(model))
         save_binary(f"{monitor_id}/scaler.pkl", pickle.dumps(scaler))
         save_metadata(monitor_id, metadata)
+        mark_model_success(monitor_id)
 
         logger.info(
             "Model training completed successfully | MONITORID=%s",
@@ -195,9 +143,14 @@ def _train_single_monitor_v2(
         )
 
     except Exception as exc:
+        if not isinstance(exc, ModelTrainingFailed):
+            exc = ModelTrainingFailed(
+                f"Unexpected training failure | MONITORID={monitor_id}"
+            )
         logger.error(
-            "Model training failed | MONITORID=%s | error=%s",
+            "Model training failed | MONITORID=%s | %s",
             monitor_id,
             exc,
             exc_info=True,
         )
+        raise

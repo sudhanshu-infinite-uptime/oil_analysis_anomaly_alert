@@ -1,26 +1,19 @@
 """
 app/models/model_loader.py
 
-Loads trained model artifacts for a given MONITORID from S3.
-
-Artifacts loaded:
-- IsolationForest model (pickle)
-- RobustScaler (pickle)
-- metadata.json
+S3-backed model loader.
 
 Responsibilities:
-- Validate model existence
-- Deserialize model artifacts
-- Return a fully usable model bundle
+- Validate model bundle existence (atomic)
+- Load model, scaler, and metadata from S3
+- Deserialize artifacts safely
+- Fail fast with explicit domain errors
 
 This module does NOT:
 - Train models
+- Retry failed loads
+- Cache models
 - Perform inference
-- Cache models in memory
-
-Used by:
-- model_cache.py
-- flink/operators.py
 """
 
 from __future__ import annotations
@@ -29,8 +22,8 @@ import pickle
 from typing import Tuple, Any, Dict
 
 from app.models.model_store import (
-    get_model_paths,
     model_exists,
+    get_model_paths,
     load_binary,
     load_metadata,
 )
@@ -41,54 +34,76 @@ logger = get_logger(__name__)
 
 
 def load_model_bundle(
-    monitor_id: str,
+    monitor_id: int,
 ) -> Tuple[Any, Any, Dict[str, Any]]:
     """
-    Load trained model bundle for a MONITORID.
+    Load a fully trained model bundle for a monitor.
 
     Returns:
         (model, scaler, metadata)
 
     Raises:
-        ModelNotFoundError: If model does not exist in S3
-        ModelLoadError: If loading or deserialization fails
+        ModelNotFoundError:
+            - No SUCCESS marker in S3
+        ModelLoadError:
+            - Corrupt bundle
+            - Deserialization failure
+            - Partial / inconsistent state
     """
 
     logger.info("Loading model bundle | MONITORID=%s", monitor_id)
 
     # ------------------------------------------------------------
-    # 1️⃣ Validate existence
+    # 1️⃣ Atomic existence check (_SUCCESS marker)
     # ------------------------------------------------------------
     if not model_exists(monitor_id):
         raise ModelNotFoundError(
             monitor_id=monitor_id,
-            path=f"models/{monitor_id}/",
+            path="oil-analysis-anomaly-alerts/<monitor_id>/",
         )
 
     paths = get_model_paths(monitor_id)
 
+    # ------------------------------------------------------------
+    # 2️⃣ Load & deserialize artifacts
+    # ------------------------------------------------------------
     try:
-        # ------------------------------------------------------------
-        # 2️⃣ Load binary artifacts
-        # ------------------------------------------------------------
         model_bytes = load_binary(paths["model_path"])
         scaler_bytes = load_binary(paths["scaler_path"])
 
         model = pickle.loads(model_bytes)
         scaler = pickle.loads(scaler_bytes)
 
-        logger.info("Loaded model & scaler | MONITORID=%s", monitor_id)
-
-        # ------------------------------------------------------------
-        # 3️⃣ Load metadata
-        # ------------------------------------------------------------
         metadata = load_metadata(monitor_id)
-        logger.info("Loaded metadata | MONITORID=%s", monitor_id)
 
     except Exception as exc:
         logger.exception(
-            "Failed loading model bundle | MONITORID=%s", monitor_id
+            "Model bundle load failed | MONITORID=%s",
+            monitor_id,
         )
-        raise ModelLoadError(monitor_id, str(exc)) from exc
+        raise ModelLoadError(
+            monitor_id=monitor_id,
+            message=str(exc),
+        ) from exc
+
+    # ------------------------------------------------------------
+    # 3️⃣ Metadata validation (hard guard)
+    # ------------------------------------------------------------
+    if metadata.get("training_status") != "SUCCESS":
+        raise ModelLoadError(
+            monitor_id=monitor_id,
+            message="Model bundle exists but training_status != SUCCESS",
+        )
+
+    if "feature_names" not in metadata:
+        raise ModelLoadError(
+            monitor_id=monitor_id,
+            message="Invalid metadata: missing feature_names",
+        )
+
+    logger.info(
+        "Model bundle loaded successfully | MONITORID=%s",
+        monitor_id,
+    )
 
     return model, scaler, metadata
