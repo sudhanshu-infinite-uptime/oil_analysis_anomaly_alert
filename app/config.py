@@ -233,7 +233,7 @@ CONFIG = Config(
 # -------------------------------------------------------------------
 _missing = []
 
-if not CONFIG.S3_BUCKET_NAME:
+if CONFIG.ENVIRONMENT == "prod" and not CONFIG.S3_BUCKET_NAME:
     _missing.append("S3_BUCKET_NAME")
 
 if not CONFIG.BROKERS:
