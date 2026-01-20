@@ -24,10 +24,11 @@ RUN pip install --no-cache-dir apache-flink==1.19.0 --no-deps
 # ------------------------------------------------------------
 RUN pip install --no-cache-dir \
     py4j==0.10.9.7 \
-    apache-beam==2.54.0 \
+    apache-beam==2.48.0 \
     avro-python3==1.10.2 \
     fastavro==1.7.4 \
-    protobuf==3.20.3
+    protobuf==3.20.3 \
+    ruamel.yaml==0.18.6
 
 # ------------------------------------------------------------
 # ML + Utility Dependencies

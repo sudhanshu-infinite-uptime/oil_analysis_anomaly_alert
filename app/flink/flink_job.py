@@ -117,3 +117,6 @@ def run_flink_job():
 
     logger.info("Starting Flink job: Oil Anomaly Detection Pipeline")
     env.execute("Oil Anomaly Detection Pipeline")
+
+if __name__ == "__main__":
+    run_flink_job()

@@ -1,0 +1,313 @@
+2026-01-20 17:35:53,659 | INFO | app.models.model_builder | Model training started (v2) | DEVICEID=AA:BB:CC:XX:YY:13
+2026-01-20 17:40:13,512 | INFO | app.models.model_builder | Model training started (v2) | DEVICEID=AA:BB:CC:XX:YY:13
+2026-01-20 17:41:15,187 | INFO | app.models.model_builder | Model training started (v2) | DEVICEID=AA:BB:CC:XX:YY:13
+2026-01-20 17:44:34,760 | INFO | app.models.model_builder | Model training started (v2) | DEVICEID=AA:BB:CC:XX:YY:13 | window=2026-01-06T00:00:00.000Z → 2026-01-08T00:00:00.000Z
+2026-01-20 17:44:34,760 | INFO | app.models.model_builder | Fetching trend history | DEVICEID=AA:BB:CC:XX:YY:13 | feature_set=['001_A', '001_B', '001_C', '001_D', '001_E', '001_F']
+2026-01-20 17:44:45,182 | WARNING | app.models.model_builder | Trend fetch failed | DEVICEID=AA:BB:CC:XX:YY:13 | feature_set=['001_A', '001_B', '001_C', '001_D', '001_E', '001_F'] | API call failed: https://api.infinite-uptime.com/api/3.0/idap-api/external-monitors/trend-history/v2 (status: 500) | Message: {"message": "Internal server error"}
+2026-01-20 17:44:45,183 | INFO | app.models.model_builder | Fetching trend history | DEVICEID=AA:BB:CC:XX:YY:13 | feature_set=['001_A', '001_B', '001_C', '001_D']
+2026-01-20 17:44:54,828 | WARNING | app.models.model_builder | Trend fetch failed | DEVICEID=AA:BB:CC:XX:YY:13 | feature_set=['001_A', '001_B', '001_C', '001_D'] | API call failed: https://api.infinite-uptime.com/api/3.0/idap-api/external-monitors/trend-history/v2 (status: 500) | Message: {"message": "Internal server error"}
+2026-01-20 17:44:54,828 | INFO | app.models.model_builder | Fetching trend history | DEVICEID=AA:BB:CC:XX:YY:13 | feature_set=['001_A', '001_B', '001_C']
+2026-01-20 17:44:59,348 | INFO | app.models.model_builder | Trend fetch successful | DEVICEID=AA:BB:CC:XX:YY:13 | records=31616
+2026-01-20 17:44:59,360 | INFO | app.models.model_builder | Training model | MONITORID=23 | raw_rows=31616
+2026-01-20 17:44:59,368 | ERROR | app.models.model_builder | Model training failed | MONITORID=23 | No valid rows after feature validation | MONITORID=23
+Traceback (most recent call last):
+  File "C:\Users\IU_Admin\Desktop\oil_analysis_anomaly_alert\app\models\model_builder.py", line 195, in _train_single_monitor_v2
+    raise ModelTrainingFailed(
+app.models.model_builder.ModelTrainingFailed: No valid rows after feature validation | MONITORID=23
+2026-01-20 17:47:33,962 | INFO | app.models.model_builder | Model training started (v2) | DEVICEID=AA:BB:CC:XX:YY:13 | window=2026-01-06T00:00:00.000Z → 2026-01-08T00:00:00.000Z
+2026-01-20 17:47:33,962 | INFO | app.models.model_builder | Fetching trend history | DEVICEID=AA:BB:CC:XX:YY:13 | feature_set=['001_A', '001_B', '001_C', '001_D', '001_E', '001_F']
+2026-01-20 17:47:44,645 | WARNING | app.models.model_builder | Trend fetch failed | DEVICEID=AA:BB:CC:XX:YY:13 | feature_set=['001_A', '001_B', '001_C', '001_D', '001_E', '001_F'] | API call failed: https://api.infinite-uptime.com/api/3.0/idap-api/external-monitors/trend-history/v2 (status: 500) | Message: {"message": "Internal server error"}
+2026-01-20 17:47:44,645 | INFO | app.models.model_builder | Fetching trend history | DEVICEID=AA:BB:CC:XX:YY:13 | feature_set=['001_A', '001_B', '001_C', '001_D']
+2026-01-20 17:47:54,342 | WARNING | app.models.model_builder | Trend fetch failed | DEVICEID=AA:BB:CC:XX:YY:13 | feature_set=['001_A', '001_B', '001_C', '001_D'] | API call failed: https://api.infinite-uptime.com/api/3.0/idap-api/external-monitors/trend-history/v2 (status: 500) | Message: {"message": "Internal server error"}
+2026-01-20 17:47:54,344 | INFO | app.models.model_builder | Fetching trend history | DEVICEID=AA:BB:CC:XX:YY:13 | feature_set=['001_A', '001_B', '001_C']
+2026-01-20 17:47:59,156 | INFO | app.models.model_builder | Trend fetch successful | DEVICEID=AA:BB:CC:XX:YY:13 | records=31616
+2026-01-20 17:47:59,167 | INFO | app.models.model_builder | Training model | MONITORID=23 | raw_rows=31616
+2026-01-20 17:48:01,342 | INFO | app.models.model_builder | Model training completed successfully | MONITORID=23 | rows=31616
+2026-01-20 17:51:13,954 | INFO | app.models.model_builder | Model training started (v2) | DEVICEID=AA:BB:CC:XX:YY:13 | window=2026-01-06T00:00:00.000Z → 2026-01-08T00:00:00.000Z
+2026-01-20 17:51:13,954 | INFO | app.models.model_builder | Fetching trend history | DEVICEID=AA:BB:CC:XX:YY:13 | feature_set=['001_A', '001_B', '001_C', '001_D', '001_E', '001_F']
+2026-01-20 17:51:24,673 | WARNING | app.models.model_builder | Trend fetch failed | DEVICEID=AA:BB:CC:XX:YY:13 | feature_set=['001_A', '001_B', '001_C', '001_D', '001_E', '001_F'] | API call failed: https://api.infinite-uptime.com/api/3.0/idap-api/external-monitors/trend-history/v2 (status: 500) | Message: {"message": "Internal server error"}
+2026-01-20 17:51:24,675 | INFO | app.models.model_builder | Fetching trend history | DEVICEID=AA:BB:CC:XX:YY:13 | feature_set=['001_A', '001_B', '001_C', '001_D']
+2026-01-20 17:51:35,572 | WARNING | app.models.model_builder | Trend fetch failed | DEVICEID=AA:BB:CC:XX:YY:13 | feature_set=['001_A', '001_B', '001_C', '001_D'] | API call failed: https://api.infinite-uptime.com/api/3.0/idap-api/external-monitors/trend-history/v2 (status: 500) | Message: {"message": "Internal server error"}
+2026-01-20 17:51:35,574 | INFO | app.models.model_builder | Fetching trend history | DEVICEID=AA:BB:CC:XX:YY:13 | feature_set=['001_A', '001_B', '001_C']
+2026-01-20 17:51:41,823 | INFO | app.models.model_builder | Trend fetch successful | DEVICEID=AA:BB:CC:XX:YY:13 | records=31616
+2026-01-20 17:51:41,833 | INFO | app.models.model_builder | Training model | MONITORID=23 | raw_rows=31616
+2026-01-20 17:51:45,984 | INFO | app.models.model_builder | Model training completed successfully | MONITORID=23 | rows=31616
+2026-01-20 17:53:46,928 | INFO | app.models.model_builder | Model training started (v2) | DEVICEID=AA:BB:CC:XX:YY:13 | window=2026-01-06T00:00:00.000Z → 2026-01-08T00:00:00.000Z
+2026-01-20 17:53:46,929 | INFO | app.models.model_builder | Fetching trend history | DEVICEID=AA:BB:CC:XX:YY:13 | feature_set=['001_A', '001_B', '001_C', '001_D', '001_E', '001_F']
+2026-01-20 17:53:57,572 | WARNING | app.models.model_builder | Trend fetch failed | DEVICEID=AA:BB:CC:XX:YY:13 | feature_set=['001_A', '001_B', '001_C', '001_D', '001_E', '001_F'] | API call failed: https://api.infinite-uptime.com/api/3.0/idap-api/external-monitors/trend-history/v2 (status: 500) | Message: {"message": "Internal server error"}
+2026-01-20 17:53:57,572 | INFO | app.models.model_builder | Fetching trend history | DEVICEID=AA:BB:CC:XX:YY:13 | feature_set=['001_A', '001_B', '001_C', '001_D']
+2026-01-20 17:54:07,154 | WARNING | app.models.model_builder | Trend fetch failed | DEVICEID=AA:BB:CC:XX:YY:13 | feature_set=['001_A', '001_B', '001_C', '001_D'] | API call failed: https://api.infinite-uptime.com/api/3.0/idap-api/external-monitors/trend-history/v2 (status: 500) | Message: {"message": "Internal server error"}
+2026-01-20 17:54:07,154 | INFO | app.models.model_builder | Fetching trend history | DEVICEID=AA:BB:CC:XX:YY:13 | feature_set=['001_A', '001_B', '001_C']
+2026-01-20 17:54:11,802 | INFO | app.models.model_builder | Trend fetch successful | DEVICEID=AA:BB:CC:XX:YY:13 | records=31616
+2026-01-20 17:54:11,802 | INFO | app.models.model_builder | Training model | MONITORID=23 | raw_rows=31616
+2026-01-20 17:54:14,406 | INFO | app.models.model_builder | Model training completed successfully | MONITORID=23 | rows=31616
+2026-01-20 17:55:32,463 | INFO | app.models.model_builder | Model training started (v2) | DEVICEID=AA:BB:CC:XX:YY:13 | window=2026-01-06T00:00:00.000Z → 2026-01-08T00:00:00.000Z
+2026-01-20 17:55:32,463 | INFO | app.models.model_builder | Fetching trend history | DEVICEID=AA:BB:CC:XX:YY:13 | feature_set=['001_A', '001_B', '001_C', '001_D', '001_E', '001_F']
+2026-01-20 17:55:43,124 | WARNING | app.models.model_builder | Trend fetch failed | DEVICEID=AA:BB:CC:XX:YY:13 | feature_set=['001_A', '001_B', '001_C', '001_D', '001_E', '001_F'] | API call failed: https://api.infinite-uptime.com/api/3.0/idap-api/external-monitors/trend-history/v2 (status: 500) | Message: {"message": "Internal server error"}
+2026-01-20 17:55:43,124 | INFO | app.models.model_builder | Fetching trend history | DEVICEID=AA:BB:CC:XX:YY:13 | feature_set=['001_A', '001_B', '001_C', '001_D']
+2026-01-20 17:55:52,731 | WARNING | app.models.model_builder | Trend fetch failed | DEVICEID=AA:BB:CC:XX:YY:13 | feature_set=['001_A', '001_B', '001_C', '001_D'] | API call failed: https://api.infinite-uptime.com/api/3.0/idap-api/external-monitors/trend-history/v2 (status: 500) | Message: {"message": "Internal server error"}
+2026-01-20 17:55:52,731 | INFO | app.models.model_builder | Fetching trend history | DEVICEID=AA:BB:CC:XX:YY:13 | feature_set=['001_A', '001_B', '001_C']
+2026-01-20 17:55:57,230 | INFO | app.models.model_builder | Trend fetch successful | DEVICEID=AA:BB:CC:XX:YY:13 | records=31616
+2026-01-20 17:55:57,235 | INFO | app.models.model_builder | Training model | MONITORID=23 | raw_rows=31616
+2026-01-20 17:55:59,681 | INFO | app.models.model_builder | Model training completed successfully | MONITORID=23 | rows=31616
+2026-01-20 18:13:59,217 | INFO | app.models.model_builder | Model training started (v2) | DEVICEID=AA:BB:CC:XX:YY:13 | window=2026-01-06T00:00:00.000Z → 2026-01-08T00:00:00.000Z
+2026-01-20 18:13:59,219 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-06T00:00:00+00:00 → 2026-01-06T01:00:00+00:00 | features=6
+2026-01-20 18:14:01,999 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-06T01:00:00+00:00 → 2026-01-06T02:00:00+00:00 | features=6
+2026-01-20 18:14:03,858 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-06T02:00:00+00:00 → 2026-01-06T03:00:00+00:00 | features=6
+2026-01-20 18:14:05,713 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-06T03:00:00+00:00 → 2026-01-06T04:00:00+00:00 | features=6
+2026-01-20 18:14:07,482 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-06T04:00:00+00:00 → 2026-01-06T05:00:00+00:00 | features=6
+2026-01-20 18:14:09,227 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-06T05:00:00+00:00 → 2026-01-06T06:00:00+00:00 | features=6
+2026-01-20 18:14:11,001 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-06T06:00:00+00:00 → 2026-01-06T07:00:00+00:00 | features=6
+2026-01-20 18:14:12,887 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-06T07:00:00+00:00 → 2026-01-06T08:00:00+00:00 | features=6
+2026-01-20 18:14:14,650 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-06T08:00:00+00:00 → 2026-01-06T09:00:00+00:00 | features=6
+2026-01-20 18:14:16,400 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-06T09:00:00+00:00 → 2026-01-06T10:00:00+00:00 | features=6
+2026-01-20 18:14:18,127 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-06T10:00:00+00:00 → 2026-01-06T11:00:00+00:00 | features=6
+2026-01-20 18:14:19,941 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-06T11:00:00+00:00 → 2026-01-06T12:00:00+00:00 | features=6
+2026-01-20 18:14:21,721 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-06T12:00:00+00:00 → 2026-01-06T13:00:00+00:00 | features=6
+2026-01-20 18:14:23,463 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-06T13:00:00+00:00 → 2026-01-06T14:00:00+00:00 | features=6
+2026-01-20 18:14:25,229 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-06T14:00:00+00:00 → 2026-01-06T15:00:00+00:00 | features=6
+2026-01-20 18:14:27,149 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-06T15:00:00+00:00 → 2026-01-06T16:00:00+00:00 | features=6
+2026-01-20 18:14:28,879 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-06T16:00:00+00:00 → 2026-01-06T17:00:00+00:00 | features=6
+2026-01-20 18:14:30,638 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-06T17:00:00+00:00 → 2026-01-06T18:00:00+00:00 | features=6
+2026-01-20 18:14:32,414 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-06T18:00:00+00:00 → 2026-01-06T19:00:00+00:00 | features=6
+2026-01-20 18:14:34,228 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-06T19:00:00+00:00 → 2026-01-06T20:00:00+00:00 | features=6
+2026-01-20 18:14:35,922 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-06T20:00:00+00:00 → 2026-01-06T21:00:00+00:00 | features=6
+2026-01-20 18:14:37,699 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-06T21:00:00+00:00 → 2026-01-06T22:00:00+00:00 | features=6
+2026-01-20 18:14:39,424 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-06T22:00:00+00:00 → 2026-01-06T23:00:00+00:00 | features=6
+2026-01-20 18:14:41,125 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-06T23:00:00+00:00 → 2026-01-07T00:00:00+00:00 | features=6
+2026-01-20 18:14:42,851 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-07T00:00:00+00:00 → 2026-01-07T01:00:00+00:00 | features=6
+2026-01-20 18:14:44,579 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-07T01:00:00+00:00 → 2026-01-07T02:00:00+00:00 | features=6
+2026-01-20 18:14:46,300 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-07T02:00:00+00:00 → 2026-01-07T03:00:00+00:00 | features=6
+2026-01-20 18:14:48,053 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-07T03:00:00+00:00 → 2026-01-07T04:00:00+00:00 | features=6
+2026-01-20 18:14:49,767 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-07T04:00:00+00:00 → 2026-01-07T05:00:00+00:00 | features=6
+2026-01-20 18:14:51,467 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-07T05:00:00+00:00 → 2026-01-07T06:00:00+00:00 | features=6
+2026-01-20 18:14:53,208 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-07T06:00:00+00:00 → 2026-01-07T07:00:00+00:00 | features=6
+2026-01-20 18:14:54,962 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-07T07:00:00+00:00 → 2026-01-07T08:00:00+00:00 | features=6
+2026-01-20 18:14:56,666 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-07T08:00:00+00:00 → 2026-01-07T09:00:00+00:00 | features=6
+2026-01-20 18:14:58,392 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-07T09:00:00+00:00 → 2026-01-07T10:00:00+00:00 | features=6
+2026-01-20 18:15:00,109 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-07T10:00:00+00:00 → 2026-01-07T11:00:00+00:00 | features=6
+2026-01-20 18:15:01,850 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-07T11:00:00+00:00 → 2026-01-07T12:00:00+00:00 | features=6
+2026-01-20 18:15:03,634 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-07T12:00:00+00:00 → 2026-01-07T13:00:00+00:00 | features=6
+2026-01-20 18:15:05,384 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-07T13:00:00+00:00 → 2026-01-07T14:00:00+00:00 | features=6
+2026-01-20 18:15:07,093 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-07T14:00:00+00:00 → 2026-01-07T15:00:00+00:00 | features=6
+2026-01-20 18:15:08,793 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-07T15:00:00+00:00 → 2026-01-07T16:00:00+00:00 | features=6
+2026-01-20 18:15:10,495 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-07T16:00:00+00:00 → 2026-01-07T17:00:00+00:00 | features=6
+2026-01-20 18:15:12,266 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-07T17:00:00+00:00 → 2026-01-07T18:00:00+00:00 | features=6
+2026-01-20 18:15:14,034 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-07T18:00:00+00:00 → 2026-01-07T19:00:00+00:00 | features=6
+2026-01-20 18:15:15,727 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-07T19:00:00+00:00 → 2026-01-07T20:00:00+00:00 | features=6
+2026-01-20 18:15:17,456 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-07T20:00:00+00:00 → 2026-01-07T21:00:00+00:00 | features=6
+2026-01-20 18:15:19,261 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-07T21:00:00+00:00 → 2026-01-07T22:00:00+00:00 | features=6
+2026-01-20 18:15:21,057 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-07T22:00:00+00:00 → 2026-01-07T23:00:00+00:00 | features=6
+2026-01-20 18:15:22,853 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-07T23:00:00+00:00 → 2026-01-08T00:00:00+00:00 | features=6
+2026-01-20 18:15:24,890 | INFO | app.models.model_builder | Trend history collected | DEVICEID=AA:BB:CC:XX:YY:13 | records=31619
+2026-01-20 18:15:24,890 | INFO | app.models.model_builder | Training model | MONITORID=23 | raw_rows=31619
+2026-01-20 18:15:25,031 | INFO | app.models.model_builder | Training columns: ['Oil Temperature', 'Water Activity', 'Moisture', 'Kinematic Viscosity', 'Oil Density', 'Oil Dielectric Constant']
+2026-01-20 18:15:34,426 | INFO | app.models.model_builder | Model training completed successfully | MONITORID=23 | rows=31619
+2026-01-20 18:20:48,881 | INFO | app.models.model_builder | Model training started (v2) | DEVICEID=AA:BB:CC:XX:YY:13 | window=2026-01-06T00:00:00.000Z → 2026-01-08T00:00:00.000Z
+2026-01-20 18:20:48,881 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-06T00:00:00+00:00 → 2026-01-06T01:00:00+00:00 | features=6
+2026-01-20 18:20:52,571 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-06T01:00:00+00:00 → 2026-01-06T02:00:00+00:00 | features=6
+2026-01-20 18:20:54,413 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-06T02:00:00+00:00 → 2026-01-06T03:00:00+00:00 | features=6
+2026-01-20 18:20:56,203 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-06T03:00:00+00:00 → 2026-01-06T04:00:00+00:00 | features=6
+2026-01-20 18:20:58,573 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-06T04:00:00+00:00 → 2026-01-06T05:00:00+00:00 | features=6
+2026-01-20 18:21:00,364 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-06T05:00:00+00:00 → 2026-01-06T06:00:00+00:00 | features=6
+2026-01-20 18:21:02,164 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-06T06:00:00+00:00 → 2026-01-06T07:00:00+00:00 | features=6
+2026-01-20 18:21:03,906 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-06T07:00:00+00:00 → 2026-01-06T08:00:00+00:00 | features=6
+2026-01-20 18:21:05,696 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-06T08:00:00+00:00 → 2026-01-06T09:00:00+00:00 | features=6
+2026-01-20 18:21:07,495 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-06T09:00:00+00:00 → 2026-01-06T10:00:00+00:00 | features=6
+2026-01-20 18:21:09,239 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-06T10:00:00+00:00 → 2026-01-06T11:00:00+00:00 | features=6
+2026-01-20 18:21:11,032 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-06T11:00:00+00:00 → 2026-01-06T12:00:00+00:00 | features=6
+2026-01-20 18:21:12,829 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-06T12:00:00+00:00 → 2026-01-06T13:00:00+00:00 | features=6
+2026-01-20 18:21:14,666 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-06T13:00:00+00:00 → 2026-01-06T14:00:00+00:00 | features=6
+2026-01-20 18:21:16,410 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-06T14:00:00+00:00 → 2026-01-06T15:00:00+00:00 | features=6
+2026-01-20 18:21:18,228 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-06T15:00:00+00:00 → 2026-01-06T16:00:00+00:00 | features=6
+2026-01-20 18:21:19,992 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-06T16:00:00+00:00 → 2026-01-06T17:00:00+00:00 | features=6
+2026-01-20 18:21:21,736 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-06T17:00:00+00:00 → 2026-01-06T18:00:00+00:00 | features=6
+2026-01-20 18:21:23,548 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-06T18:00:00+00:00 → 2026-01-06T19:00:00+00:00 | features=6
+2026-01-20 18:21:25,343 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-06T19:00:00+00:00 → 2026-01-06T20:00:00+00:00 | features=6
+2026-01-20 18:21:27,165 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-06T20:00:00+00:00 → 2026-01-06T21:00:00+00:00 | features=6
+2026-01-20 18:21:29,014 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-06T21:00:00+00:00 → 2026-01-06T22:00:00+00:00 | features=6
+2026-01-20 18:21:30,741 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-06T22:00:00+00:00 → 2026-01-06T23:00:00+00:00 | features=6
+2026-01-20 18:21:32,530 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-06T23:00:00+00:00 → 2026-01-07T00:00:00+00:00 | features=6
+2026-01-20 18:21:34,264 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-07T00:00:00+00:00 → 2026-01-07T01:00:00+00:00 | features=6
+2026-01-20 18:21:36,022 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-07T01:00:00+00:00 → 2026-01-07T02:00:00+00:00 | features=6
+2026-01-20 18:21:37,807 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-07T02:00:00+00:00 → 2026-01-07T03:00:00+00:00 | features=6
+2026-01-20 18:21:39,618 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-07T03:00:00+00:00 → 2026-01-07T04:00:00+00:00 | features=6
+2026-01-20 18:21:41,409 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-07T04:00:00+00:00 → 2026-01-07T05:00:00+00:00 | features=6
+2026-01-20 18:21:43,156 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-07T05:00:00+00:00 → 2026-01-07T06:00:00+00:00 | features=6
+2026-01-20 18:21:44,860 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-07T06:00:00+00:00 → 2026-01-07T07:00:00+00:00 | features=6
+2026-01-20 18:21:46,574 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-07T07:00:00+00:00 → 2026-01-07T08:00:00+00:00 | features=6
+2026-01-20 18:21:48,331 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-07T08:00:00+00:00 → 2026-01-07T09:00:00+00:00 | features=6
+2026-01-20 18:21:50,135 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-07T09:00:00+00:00 → 2026-01-07T10:00:00+00:00 | features=6
+2026-01-20 18:21:51,842 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-07T10:00:00+00:00 → 2026-01-07T11:00:00+00:00 | features=6
+2026-01-20 18:21:53,545 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-07T11:00:00+00:00 → 2026-01-07T12:00:00+00:00 | features=6
+2026-01-20 18:21:55,293 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-07T12:00:00+00:00 → 2026-01-07T13:00:00+00:00 | features=6
+2026-01-20 18:21:56,985 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-07T13:00:00+00:00 → 2026-01-07T14:00:00+00:00 | features=6
+2026-01-20 18:21:58,709 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-07T14:00:00+00:00 → 2026-01-07T15:00:00+00:00 | features=6
+2026-01-20 18:22:00,495 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-07T15:00:00+00:00 → 2026-01-07T16:00:00+00:00 | features=6
+2026-01-20 18:22:02,199 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-07T16:00:00+00:00 → 2026-01-07T17:00:00+00:00 | features=6
+2026-01-20 18:22:03,891 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-07T17:00:00+00:00 → 2026-01-07T18:00:00+00:00 | features=6
+2026-01-20 18:22:05,614 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-07T18:00:00+00:00 → 2026-01-07T19:00:00+00:00 | features=6
+2026-01-20 18:22:07,346 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-07T19:00:00+00:00 → 2026-01-07T20:00:00+00:00 | features=6
+2026-01-20 18:22:09,128 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-07T20:00:00+00:00 → 2026-01-07T21:00:00+00:00 | features=6
+2026-01-20 18:22:10,898 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-07T21:00:00+00:00 → 2026-01-07T22:00:00+00:00 | features=6
+2026-01-20 18:22:12,628 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-07T22:00:00+00:00 → 2026-01-07T23:00:00+00:00 | features=6
+2026-01-20 18:22:14,375 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-07T23:00:00+00:00 → 2026-01-08T00:00:00+00:00 | features=6
+2026-01-20 18:22:16,069 | INFO | app.models.model_builder | Trend history collected | DEVICEID=AA:BB:CC:XX:YY:13 | records=31619
+2026-01-20 18:22:16,097 | INFO | app.models.model_builder | Training model | MONITORID=23 | raw_rows=31619
+2026-01-20 18:22:21,624 | INFO | app.models.model_builder | Model training completed successfully | MONITORID=23 | rows=31619
+2026-01-20 18:25:09,514 | INFO | app.models.model_builder | Model training started (v2) | DEVICEID=AA:BB:CC:XX:YY:13 | window=2026-01-06T00:00:00.000Z → 2026-01-08T00:00:00.000Z
+2026-01-20 18:25:09,514 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-06T00:00:00+00:00 → 2026-01-06T01:00:00+00:00 | features=6
+2026-01-20 18:25:12,040 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-06T01:00:00+00:00 → 2026-01-06T02:00:00+00:00 | features=6
+2026-01-20 18:25:13,883 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-06T02:00:00+00:00 → 2026-01-06T03:00:00+00:00 | features=6
+2026-01-20 18:25:15,706 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-06T03:00:00+00:00 → 2026-01-06T04:00:00+00:00 | features=6
+2026-01-20 18:25:17,454 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-06T04:00:00+00:00 → 2026-01-06T05:00:00+00:00 | features=6
+2026-01-20 18:25:19,332 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-06T05:00:00+00:00 → 2026-01-06T06:00:00+00:00 | features=6
+2026-01-20 18:25:21,027 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-06T06:00:00+00:00 → 2026-01-06T07:00:00+00:00 | features=6
+2026-01-20 18:25:22,821 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-06T07:00:00+00:00 → 2026-01-06T08:00:00+00:00 | features=6
+2026-01-20 18:25:24,617 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-06T08:00:00+00:00 → 2026-01-06T09:00:00+00:00 | features=6
+2026-01-20 18:25:26,500 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-06T09:00:00+00:00 → 2026-01-06T10:00:00+00:00 | features=6
+2026-01-20 18:25:28,380 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-06T10:00:00+00:00 → 2026-01-06T11:00:00+00:00 | features=6
+2026-01-20 18:25:30,157 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-06T11:00:00+00:00 → 2026-01-06T12:00:00+00:00 | features=6
+2026-01-20 18:25:31,937 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-06T12:00:00+00:00 → 2026-01-06T13:00:00+00:00 | features=6
+2026-01-20 18:25:33,805 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-06T13:00:00+00:00 → 2026-01-06T14:00:00+00:00 | features=6
+2026-01-20 18:25:35,584 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-06T14:00:00+00:00 → 2026-01-06T15:00:00+00:00 | features=6
+2026-01-20 18:25:37,407 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-06T15:00:00+00:00 → 2026-01-06T16:00:00+00:00 | features=6
+2026-01-20 18:25:39,152 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-06T16:00:00+00:00 → 2026-01-06T17:00:00+00:00 | features=6
+2026-01-20 18:25:41,004 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-06T17:00:00+00:00 → 2026-01-06T18:00:00+00:00 | features=6
+2026-01-20 18:25:42,768 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-06T18:00:00+00:00 → 2026-01-06T19:00:00+00:00 | features=6
+2026-01-20 18:25:44,486 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-06T19:00:00+00:00 → 2026-01-06T20:00:00+00:00 | features=6
+2026-01-20 18:25:46,264 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-06T20:00:00+00:00 → 2026-01-06T21:00:00+00:00 | features=6
+2026-01-20 18:25:48,004 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-06T21:00:00+00:00 → 2026-01-06T22:00:00+00:00 | features=6
+2026-01-20 18:25:49,765 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-06T22:00:00+00:00 → 2026-01-06T23:00:00+00:00 | features=6
+2026-01-20 18:25:51,524 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-06T23:00:00+00:00 → 2026-01-07T00:00:00+00:00 | features=6
+2026-01-20 18:25:53,328 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-07T00:00:00+00:00 → 2026-01-07T01:00:00+00:00 | features=6
+2026-01-20 18:25:55,073 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-07T01:00:00+00:00 → 2026-01-07T02:00:00+00:00 | features=6
+2026-01-20 18:25:56,855 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-07T02:00:00+00:00 → 2026-01-07T03:00:00+00:00 | features=6
+2026-01-20 18:25:58,556 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-07T03:00:00+00:00 → 2026-01-07T04:00:00+00:00 | features=6
+2026-01-20 18:26:00,327 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-07T04:00:00+00:00 → 2026-01-07T05:00:00+00:00 | features=6
+2026-01-20 18:26:02,077 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-07T05:00:00+00:00 → 2026-01-07T06:00:00+00:00 | features=6
+2026-01-20 18:26:03,989 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-07T06:00:00+00:00 → 2026-01-07T07:00:00+00:00 | features=6
+2026-01-20 18:26:06,722 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-07T07:00:00+00:00 → 2026-01-07T08:00:00+00:00 | features=6
+2026-01-20 18:26:08,491 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-07T08:00:00+00:00 → 2026-01-07T09:00:00+00:00 | features=6
+2026-01-20 18:26:10,254 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-07T09:00:00+00:00 → 2026-01-07T10:00:00+00:00 | features=6
+2026-01-20 18:26:11,987 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-07T10:00:00+00:00 → 2026-01-07T11:00:00+00:00 | features=6
+2026-01-20 18:26:13,729 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-07T11:00:00+00:00 → 2026-01-07T12:00:00+00:00 | features=6
+2026-01-20 18:26:15,483 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-07T12:00:00+00:00 → 2026-01-07T13:00:00+00:00 | features=6
+2026-01-20 18:26:17,222 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-07T13:00:00+00:00 → 2026-01-07T14:00:00+00:00 | features=6
+2026-01-20 18:26:18,980 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-07T14:00:00+00:00 → 2026-01-07T15:00:00+00:00 | features=6
+2026-01-20 18:26:20,728 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-07T15:00:00+00:00 → 2026-01-07T16:00:00+00:00 | features=6
+2026-01-20 18:26:22,463 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-07T16:00:00+00:00 → 2026-01-07T17:00:00+00:00 | features=6
+2026-01-20 18:26:24,210 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-07T17:00:00+00:00 → 2026-01-07T18:00:00+00:00 | features=6
+2026-01-20 18:26:25,940 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-07T18:00:00+00:00 → 2026-01-07T19:00:00+00:00 | features=6
+2026-01-20 18:26:27,687 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-07T19:00:00+00:00 → 2026-01-07T20:00:00+00:00 | features=6
+2026-01-20 18:26:29,413 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-07T20:00:00+00:00 → 2026-01-07T21:00:00+00:00 | features=6
+2026-01-20 18:26:31,153 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-07T21:00:00+00:00 → 2026-01-07T22:00:00+00:00 | features=6
+2026-01-20 18:26:32,941 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-07T22:00:00+00:00 → 2026-01-07T23:00:00+00:00 | features=6
+2026-01-20 18:26:34,761 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-07T23:00:00+00:00 → 2026-01-08T00:00:00+00:00 | features=6
+2026-01-20 18:26:36,597 | INFO | app.models.model_builder | Trend history collected | DEVICEID=AA:BB:CC:XX:YY:13 | records=31619
+2026-01-20 18:26:36,609 | INFO | app.models.model_builder | Training model | MONITORID=23 | raw_rows=31619
+2026-01-20 18:26:42,338 | INFO | app.models.model_builder | Model training completed successfully | MONITORID=23 | rows=31619
+2026-01-20 18:31:32,704 | INFO | app.models.model_builder | Model training started (v2) | DEVICEID=AA:BB:CC:XX:YY:13 | window=2026-01-06T00:00:00.000Z → 2026-01-08T00:00:00.000Z
+2026-01-20 18:31:32,704 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-06T00:00:00+00:00 → 2026-01-06T01:00:00+00:00 | features=6
+2026-01-20 18:31:35,329 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-06T01:00:00+00:00 → 2026-01-06T02:00:00+00:00 | features=6
+2026-01-20 18:31:37,090 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-06T02:00:00+00:00 → 2026-01-06T03:00:00+00:00 | features=6
+2026-01-20 18:31:38,808 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-06T03:00:00+00:00 → 2026-01-06T04:00:00+00:00 | features=6
+2026-01-20 18:31:40,652 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-06T04:00:00+00:00 → 2026-01-06T05:00:00+00:00 | features=6
+2026-01-20 18:31:42,428 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-06T05:00:00+00:00 → 2026-01-06T06:00:00+00:00 | features=6
+2026-01-20 18:31:44,274 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-06T06:00:00+00:00 → 2026-01-06T07:00:00+00:00 | features=6
+2026-01-20 18:31:45,984 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-06T07:00:00+00:00 → 2026-01-06T08:00:00+00:00 | features=6
+2026-01-20 18:31:47,780 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-06T08:00:00+00:00 → 2026-01-06T09:00:00+00:00 | features=6
+2026-01-20 18:31:49,536 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-06T09:00:00+00:00 → 2026-01-06T10:00:00+00:00 | features=6
+2026-01-20 18:31:51,305 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-06T10:00:00+00:00 → 2026-01-06T11:00:00+00:00 | features=6
+2026-01-20 18:31:53,046 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-06T11:00:00+00:00 → 2026-01-06T12:00:00+00:00 | features=6
+2026-01-20 18:31:54,826 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-06T12:00:00+00:00 → 2026-01-06T13:00:00+00:00 | features=6
+2026-01-20 18:31:56,557 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-06T13:00:00+00:00 → 2026-01-06T14:00:00+00:00 | features=6
+2026-01-20 18:31:58,273 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-06T14:00:00+00:00 → 2026-01-06T15:00:00+00:00 | features=6
+2026-01-20 18:32:00,088 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-06T15:00:00+00:00 → 2026-01-06T16:00:00+00:00 | features=6
+2026-01-20 18:32:01,880 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-06T16:00:00+00:00 → 2026-01-06T17:00:00+00:00 | features=6
+2026-01-20 18:32:03,689 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-06T17:00:00+00:00 → 2026-01-06T18:00:00+00:00 | features=6
+2026-01-20 18:32:05,452 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-06T18:00:00+00:00 → 2026-01-06T19:00:00+00:00 | features=6
+2026-01-20 18:32:07,242 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-06T19:00:00+00:00 → 2026-01-06T20:00:00+00:00 | features=6
+2026-01-20 18:32:08,975 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-06T20:00:00+00:00 → 2026-01-06T21:00:00+00:00 | features=6
+2026-01-20 18:32:10,731 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-06T21:00:00+00:00 → 2026-01-06T22:00:00+00:00 | features=6
+2026-01-20 18:32:12,504 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-06T22:00:00+00:00 → 2026-01-06T23:00:00+00:00 | features=6
+2026-01-20 18:32:14,242 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-06T23:00:00+00:00 → 2026-01-07T00:00:00+00:00 | features=6
+2026-01-20 18:32:15,992 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-07T00:00:00+00:00 → 2026-01-07T01:00:00+00:00 | features=6
+2026-01-20 18:32:17,727 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-07T01:00:00+00:00 → 2026-01-07T02:00:00+00:00 | features=6
+2026-01-20 18:32:19,472 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-07T02:00:00+00:00 → 2026-01-07T03:00:00+00:00 | features=6
+2026-01-20 18:32:21,199 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-07T03:00:00+00:00 → 2026-01-07T04:00:00+00:00 | features=6
+2026-01-20 18:32:22,947 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-07T04:00:00+00:00 → 2026-01-07T05:00:00+00:00 | features=6
+2026-01-20 18:32:24,744 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-07T05:00:00+00:00 → 2026-01-07T06:00:00+00:00 | features=6
+2026-01-20 18:32:26,468 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-07T06:00:00+00:00 → 2026-01-07T07:00:00+00:00 | features=6
+2026-01-20 18:32:28,221 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-07T07:00:00+00:00 → 2026-01-07T08:00:00+00:00 | features=6
+2026-01-20 18:32:30,004 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-07T08:00:00+00:00 → 2026-01-07T09:00:00+00:00 | features=6
+2026-01-20 18:32:31,782 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-07T09:00:00+00:00 → 2026-01-07T10:00:00+00:00 | features=6
+2026-01-20 18:32:33,516 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-07T10:00:00+00:00 → 2026-01-07T11:00:00+00:00 | features=6
+2026-01-20 18:32:35,271 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-07T11:00:00+00:00 → 2026-01-07T12:00:00+00:00 | features=6
+2026-01-20 18:32:37,004 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-07T12:00:00+00:00 → 2026-01-07T13:00:00+00:00 | features=6
+2026-01-20 18:32:38,729 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-07T13:00:00+00:00 → 2026-01-07T14:00:00+00:00 | features=6
+2026-01-20 18:32:40,468 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-07T14:00:00+00:00 → 2026-01-07T15:00:00+00:00 | features=6
+2026-01-20 18:32:42,203 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-07T15:00:00+00:00 → 2026-01-07T16:00:00+00:00 | features=6
+2026-01-20 18:32:43,971 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-07T16:00:00+00:00 → 2026-01-07T17:00:00+00:00 | features=6
+2026-01-20 18:32:45,695 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-07T17:00:00+00:00 → 2026-01-07T18:00:00+00:00 | features=6
+2026-01-20 18:32:47,468 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-07T18:00:00+00:00 → 2026-01-07T19:00:00+00:00 | features=6
+2026-01-20 18:32:49,206 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-07T19:00:00+00:00 → 2026-01-07T20:00:00+00:00 | features=6
+2026-01-20 18:32:50,941 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-07T20:00:00+00:00 → 2026-01-07T21:00:00+00:00 | features=6
+2026-01-20 18:32:52,675 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-07T21:00:00+00:00 → 2026-01-07T22:00:00+00:00 | features=6
+2026-01-20 18:32:54,395 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-07T22:00:00+00:00 → 2026-01-07T23:00:00+00:00 | features=6
+2026-01-20 18:32:56,172 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-07T23:00:00+00:00 → 2026-01-08T00:00:00+00:00 | features=6
+2026-01-20 18:32:57,918 | INFO | app.models.model_builder | Trend history collected | DEVICEID=AA:BB:CC:XX:YY:13 | records=31619
+2026-01-20 18:32:57,930 | INFO | app.models.model_builder | Training model | MONITORID=23 | raw_rows=31619
+2026-01-20 18:33:00,457 | INFO | app.models.model_builder | Model training completed successfully | MONITORID=23 | rows=31619
+2026-01-20 18:34:29,026 | INFO | app.models.model_builder | Model training started (v2) | DEVICEID=AA:BB:CC:XX:YY:13 | window=2026-01-06T00:00:00.000Z → 2026-01-08T00:00:00.000Z
+2026-01-20 18:34:29,026 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-06T00:00:00+00:00 → 2026-01-06T01:00:00+00:00 | features=6
+2026-01-20 18:34:31,558 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-06T01:00:00+00:00 → 2026-01-06T02:00:00+00:00 | features=6
+2026-01-20 18:34:33,391 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-06T02:00:00+00:00 → 2026-01-06T03:00:00+00:00 | features=6
+2026-01-20 18:34:35,175 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-06T03:00:00+00:00 → 2026-01-06T04:00:00+00:00 | features=6
+2026-01-20 18:34:37,024 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-06T04:00:00+00:00 → 2026-01-06T05:00:00+00:00 | features=6
+2026-01-20 18:34:38,758 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-06T05:00:00+00:00 → 2026-01-06T06:00:00+00:00 | features=6
+2026-01-20 18:34:40,479 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-06T06:00:00+00:00 → 2026-01-06T07:00:00+00:00 | features=6
+2026-01-20 18:34:42,200 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-06T07:00:00+00:00 → 2026-01-06T08:00:00+00:00 | features=6
+2026-01-20 18:34:43,957 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-06T08:00:00+00:00 → 2026-01-06T09:00:00+00:00 | features=6
+2026-01-20 18:34:45,658 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-06T09:00:00+00:00 → 2026-01-06T10:00:00+00:00 | features=6
+2026-01-20 18:34:47,436 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-06T10:00:00+00:00 → 2026-01-06T11:00:00+00:00 | features=6
+2026-01-20 18:34:49,229 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-06T11:00:00+00:00 → 2026-01-06T12:00:00+00:00 | features=6
+2026-01-20 18:34:50,942 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-06T12:00:00+00:00 → 2026-01-06T13:00:00+00:00 | features=6
+2026-01-20 18:34:52,679 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-06T13:00:00+00:00 → 2026-01-06T14:00:00+00:00 | features=6
+2026-01-20 18:34:54,399 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-06T14:00:00+00:00 → 2026-01-06T15:00:00+00:00 | features=6
+2026-01-20 18:34:56,163 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-06T15:00:00+00:00 → 2026-01-06T16:00:00+00:00 | features=6
+2026-01-20 18:34:57,885 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-06T16:00:00+00:00 → 2026-01-06T17:00:00+00:00 | features=6
+2026-01-20 18:34:59,684 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-06T17:00:00+00:00 → 2026-01-06T18:00:00+00:00 | features=6
+2026-01-20 18:35:01,411 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-06T18:00:00+00:00 → 2026-01-06T19:00:00+00:00 | features=6
+2026-01-20 18:35:03,127 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-06T19:00:00+00:00 → 2026-01-06T20:00:00+00:00 | features=6
+2026-01-20 18:35:04,833 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-06T20:00:00+00:00 → 2026-01-06T21:00:00+00:00 | features=6
+2026-01-20 18:35:06,564 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-06T21:00:00+00:00 → 2026-01-06T22:00:00+00:00 | features=6
+2026-01-20 18:35:08,273 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-06T22:00:00+00:00 → 2026-01-06T23:00:00+00:00 | features=6
+2026-01-20 18:35:09,956 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-06T23:00:00+00:00 → 2026-01-07T00:00:00+00:00 | features=6
+2026-01-20 18:35:11,627 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-07T00:00:00+00:00 → 2026-01-07T01:00:00+00:00 | features=6
+2026-01-20 18:35:13,342 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-07T01:00:00+00:00 → 2026-01-07T02:00:00+00:00 | features=6
+2026-01-20 18:35:15,083 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-07T02:00:00+00:00 → 2026-01-07T03:00:00+00:00 | features=6
+2026-01-20 18:35:16,758 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-07T03:00:00+00:00 → 2026-01-07T04:00:00+00:00 | features=6
+2026-01-20 18:35:18,454 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-07T04:00:00+00:00 → 2026-01-07T05:00:00+00:00 | features=6
+2026-01-20 18:35:20,260 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-07T05:00:00+00:00 → 2026-01-07T06:00:00+00:00 | features=6
+2026-01-20 18:35:21,961 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-07T06:00:00+00:00 → 2026-01-07T07:00:00+00:00 | features=6
+2026-01-20 18:35:23,706 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-07T07:00:00+00:00 → 2026-01-07T08:00:00+00:00 | features=6
+2026-01-20 18:35:25,422 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-07T08:00:00+00:00 → 2026-01-07T09:00:00+00:00 | features=6
+2026-01-20 18:35:27,183 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-07T09:00:00+00:00 → 2026-01-07T10:00:00+00:00 | features=6
+2026-01-20 18:35:28,882 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-07T10:00:00+00:00 → 2026-01-07T11:00:00+00:00 | features=6
+2026-01-20 18:35:30,564 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-07T11:00:00+00:00 → 2026-01-07T12:00:00+00:00 | features=6
+2026-01-20 18:35:32,296 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-07T12:00:00+00:00 → 2026-01-07T13:00:00+00:00 | features=6
+2026-01-20 18:35:34,044 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-07T13:00:00+00:00 → 2026-01-07T14:00:00+00:00 | features=6
+2026-01-20 18:35:35,809 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-07T14:00:00+00:00 → 2026-01-07T15:00:00+00:00 | features=6
+2026-01-20 18:35:37,540 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-07T15:00:00+00:00 → 2026-01-07T16:00:00+00:00 | features=6
+2026-01-20 18:35:39,299 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-07T16:00:00+00:00 → 2026-01-07T17:00:00+00:00 | features=6
+2026-01-20 18:35:41,047 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-07T17:00:00+00:00 → 2026-01-07T18:00:00+00:00 | features=6
+2026-01-20 18:35:42,753 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-07T18:00:00+00:00 → 2026-01-07T19:00:00+00:00 | features=6
+2026-01-20 18:35:44,504 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-07T19:00:00+00:00 → 2026-01-07T20:00:00+00:00 | features=6
+2026-01-20 18:35:46,235 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-07T20:00:00+00:00 → 2026-01-07T21:00:00+00:00 | features=6
+2026-01-20 18:35:47,958 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-07T21:00:00+00:00 → 2026-01-07T22:00:00+00:00 | features=6
+2026-01-20 18:35:49,697 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-07T22:00:00+00:00 → 2026-01-07T23:00:00+00:00 | features=6
+2026-01-20 18:35:51,423 | INFO | app.models.model_builder | Fetching trend chunk | DEVICEID=AA:BB:CC:XX:YY:13 | 2026-01-07T23:00:00+00:00 → 2026-01-08T00:00:00+00:00 | features=6
+2026-01-20 18:35:53,176 | INFO | app.models.model_builder | Trend history collected | DEVICEID=AA:BB:CC:XX:YY:13 | records=31619
+2026-01-20 18:35:53,186 | INFO | app.models.model_builder | Training model | MONITORID=23 | raw_rows=31619
+2026-01-20 18:35:55,948 | INFO | app.models.model_builder | Model training completed successfully | MONITORID=23 | rows=31619

@@ -1,0 +1,166 @@
+2026-01-20 17:35:53,655 | INFO | __main__ | ========== MODEL BUILDER LOCAL VALIDATION ==========
+2026-01-20 17:35:53,655 | INFO | __main__ | Device ID      : AA:BB:CC:XX:YY:13
+2026-01-20 17:35:53,655 | INFO | __main__ | Train Start    : 2026-01-06T00:00:00.000Z
+2026-01-20 17:35:53,655 | INFO | __main__ | Train End      : 2026-01-08T00:00:00.000Z
+2026-01-20 17:35:53,658 | INFO | __main__ | Model Dir      : \opt\flink\models
+2026-01-20 17:35:53,659 | INFO | __main__ | ====================================================
+2026-01-20 17:35:53,659 | INFO | __main__ | Starting model training via model_builder...
+2026-01-20 17:36:04,476 | ERROR | __main__ | ❌ Model training failed
+2026-01-20 17:36:04,476 | ERROR | __main__ | Trend API v2 call failed
+2026-01-20 17:40:13,506 | INFO | __main__ | ========== MODEL BUILDER LOCAL VALIDATION ==========
+2026-01-20 17:40:13,506 | INFO | __main__ | Device ID      : AA:BB:CC:XX:YY:13
+2026-01-20 17:40:13,511 | INFO | __main__ | Train Start    : 2026-01-06T00:00:00.000Z
+2026-01-20 17:40:13,512 | INFO | __main__ | Train End      : 2026-01-08T00:00:00.000Z
+2026-01-20 17:40:13,512 | INFO | __main__ | Model Dir      : \opt\flink\models
+2026-01-20 17:40:13,512 | INFO | __main__ | ====================================================
+2026-01-20 17:40:13,512 | INFO | __main__ | Starting model training via model_builder...
+2026-01-20 17:40:24,327 | ERROR | __main__ | ❌ Model training failed
+2026-01-20 17:40:24,327 | ERROR | __main__ | Trend API v2 call failed
+2026-01-20 17:41:15,187 | INFO | __main__ | ========== MODEL BUILDER LOCAL VALIDATION ==========
+2026-01-20 17:41:15,187 | INFO | __main__ | Device ID      : AA:BB:CC:XX:YY:13
+2026-01-20 17:41:15,187 | INFO | __main__ | Train Start    : 2026-01-06T00:00:00.000Z
+2026-01-20 17:41:15,187 | INFO | __main__ | Train End      : 2026-01-08T00:00:00.000Z
+2026-01-20 17:41:15,187 | INFO | __main__ | Model Dir      : \opt\flink\models
+2026-01-20 17:41:15,187 | INFO | __main__ | ====================================================
+2026-01-20 17:41:15,187 | INFO | __main__ | Starting model training via model_builder...
+2026-01-20 17:41:26,925 | ERROR | __main__ | ❌ Model training failed
+2026-01-20 17:41:26,925 | ERROR | __main__ | Trend API v2 call failed
+2026-01-20 17:44:34,757 | INFO | __main__ | ========== MODEL BUILDER LOCAL VALIDATION ==========
+2026-01-20 17:44:34,757 | INFO | __main__ | Device ID      : AA:BB:CC:XX:YY:13
+2026-01-20 17:44:34,758 | INFO | __main__ | Train Start    : 2026-01-06T00:00:00.000Z
+2026-01-20 17:44:34,758 | INFO | __main__ | Train End      : 2026-01-08T00:00:00.000Z
+2026-01-20 17:44:34,758 | INFO | __main__ | Model Dir      : \opt\flink\models
+2026-01-20 17:44:34,759 | INFO | __main__ | ====================================================
+2026-01-20 17:44:34,759 | INFO | __main__ | Starting model training via model_builder...
+2026-01-20 17:44:59,368 | ERROR | __main__ | ❌ Model training failed
+2026-01-20 17:44:59,368 | ERROR | __main__ | No valid rows after feature validation | MONITORID=23
+2026-01-20 17:47:33,959 | INFO | __main__ | ========== MODEL BUILDER LOCAL VALIDATION ==========
+2026-01-20 17:47:33,959 | INFO | __main__ | Device ID      : AA:BB:CC:XX:YY:13
+2026-01-20 17:47:33,959 | INFO | __main__ | Train Start    : 2026-01-06T00:00:00.000Z
+2026-01-20 17:47:33,959 | INFO | __main__ | Train End      : 2026-01-08T00:00:00.000Z
+2026-01-20 17:47:33,962 | INFO | __main__ | Model Dir      : \opt\flink\models
+2026-01-20 17:47:33,962 | INFO | __main__ | ====================================================
+2026-01-20 17:47:33,962 | INFO | __main__ | Starting model training via model_builder...
+2026-01-20 17:48:01,364 | INFO | __main__ | Checking if model exists locally...
+2026-01-20 17:48:01,424 | INFO | __main__ | ✅ Model successfully created
+2026-01-20 17:48:01,424 | INFO | __main__ | Model path: {'model_path': '23/model.pkl', 'scaler_path': '23/scaler.pkl', 'metadata_path': '23/metadata.json'}
+2026-01-20 17:51:13,954 | INFO | __main__ | ========== MODEL BUILDER LOCAL VALIDATION ==========
+2026-01-20 17:51:13,954 | INFO | __main__ | Device ID   : AA:BB:CC:XX:YY:13
+2026-01-20 17:51:13,954 | INFO | __main__ | Train Start : 2026-01-06T00:00:00.000Z
+2026-01-20 17:51:13,954 | INFO | __main__ | Train End   : 2026-01-08T00:00:00.000Z
+2026-01-20 17:51:13,954 | INFO | __main__ | ===================================================
+2026-01-20 17:51:13,954 | INFO | __main__ | Starting model training via model_builder...
+2026-01-20 17:51:46,021 | INFO | __main__ | Checking if model exists locally...
+2026-01-20 17:51:46,078 | INFO | __main__ | Model artifacts:
+2026-01-20 17:51:46,083 | INFO | __main__ | Model    : 23\model.pkl
+2026-01-20 17:51:46,084 | INFO | __main__ | Scaler   : 23\scaler.pkl
+2026-01-20 17:51:46,086 | INFO | __main__ | Metadata : 23\metadata.json
+2026-01-20 17:51:46,087 | ERROR | __main__ | ❌ Missing model artifacts:
+2026-01-20 17:51:46,090 | ERROR | __main__ |  - 23\model.pkl
+2026-01-20 17:51:46,092 | ERROR | __main__ |  - 23\scaler.pkl
+2026-01-20 17:51:46,095 | ERROR | __main__ |  - 23\metadata.json
+2026-01-20 17:53:46,926 | INFO | __main__ | ========== MODEL BUILDER LOCAL VALIDATION ==========
+2026-01-20 17:53:46,927 | INFO | __main__ | Device ID   : AA:BB:CC:XX:YY:13
+2026-01-20 17:53:46,927 | INFO | __main__ | Train Start : 2026-01-06T00:00:00.000Z
+2026-01-20 17:53:46,927 | INFO | __main__ | Train End   : 2026-01-08T00:00:00.000Z
+2026-01-20 17:53:46,928 | INFO | __main__ | ===================================================
+2026-01-20 17:53:46,928 | INFO | __main__ | Starting model training via model_builder...
+2026-01-20 17:54:14,431 | INFO | __main__ | Checking if model exists locally...
+2026-01-20 17:54:14,494 | INFO | __main__ | Model artifacts:
+2026-01-20 17:54:14,494 | INFO | __main__ | Model    : 23\model.pkl
+2026-01-20 17:54:14,494 | INFO | __main__ | Scaler   : 23\scaler.pkl
+2026-01-20 17:54:14,494 | INFO | __main__ | Metadata : 23\metadata.json
+2026-01-20 17:54:14,494 | ERROR | __main__ | ❌ Missing model artifacts:
+2026-01-20 17:54:14,498 | ERROR | __main__ |  - 23\model.pkl
+2026-01-20 17:54:14,498 | ERROR | __main__ |  - 23\scaler.pkl
+2026-01-20 17:54:14,498 | ERROR | __main__ |  - 23\metadata.json
+2026-01-20 17:55:32,463 | INFO | __main__ | ========== MODEL BUILDER LOCAL VALIDATION ==========
+2026-01-20 17:55:32,463 | INFO | __main__ | Device ID   : AA:BB:CC:XX:YY:13
+2026-01-20 17:55:32,463 | INFO | __main__ | Train Start : 2026-01-06T00:00:00.000Z
+2026-01-20 17:55:32,463 | INFO | __main__ | Train End   : 2026-01-08T00:00:00.000Z
+2026-01-20 17:55:32,463 | INFO | __main__ | Model Base  : C:\Users\IU_Admin\Desktop\oil_analysis_anomaly_alert\models
+2026-01-20 17:55:32,463 | INFO | __main__ | ===================================================
+2026-01-20 17:55:32,463 | INFO | __main__ | Starting model training via model_builder...
+2026-01-20 17:55:59,698 | INFO | __main__ | Checking if model exists locally...
+2026-01-20 17:55:59,752 | INFO | __main__ | Model artifacts:
+2026-01-20 17:55:59,752 | INFO | __main__ | Model    : C:\Users\IU_Admin\Desktop\oil_analysis_anomaly_alert\models\23\model.pkl
+2026-01-20 17:55:59,756 | INFO | __main__ | Scaler   : C:\Users\IU_Admin\Desktop\oil_analysis_anomaly_alert\models\23\scaler.pkl
+2026-01-20 17:55:59,756 | INFO | __main__ | Metadata : C:\Users\IU_Admin\Desktop\oil_analysis_anomaly_alert\models\23\metadata.json
+2026-01-20 17:55:59,759 | ERROR | __main__ | ❌ Missing model artifacts:
+2026-01-20 17:55:59,760 | ERROR | __main__ |  - C:\Users\IU_Admin\Desktop\oil_analysis_anomaly_alert\models\23\model.pkl
+2026-01-20 17:55:59,760 | ERROR | __main__ |  - C:\Users\IU_Admin\Desktop\oil_analysis_anomaly_alert\models\23\scaler.pkl
+2026-01-20 17:55:59,762 | ERROR | __main__ |  - C:\Users\IU_Admin\Desktop\oil_analysis_anomaly_alert\models\23\metadata.json
+2026-01-20 18:13:59,210 | INFO | __main__ | ========== MODEL BUILDER LOCAL VALIDATION ==========
+2026-01-20 18:13:59,211 | INFO | __main__ | Device ID   : AA:BB:CC:XX:YY:13
+2026-01-20 18:13:59,213 | INFO | __main__ | Train Start : 2026-01-06T00:00:00.000Z
+2026-01-20 18:13:59,213 | INFO | __main__ | Train End   : 2026-01-08T00:00:00.000Z
+2026-01-20 18:13:59,213 | INFO | __main__ | Model Base  : C:\Users\IU_Admin\Desktop\oil_analysis_anomaly_alert\models
+2026-01-20 18:13:59,215 | INFO | __main__ | ===================================================
+2026-01-20 18:13:59,215 | INFO | __main__ | Starting model training via model_builder...
+2026-01-20 18:15:34,442 | INFO | __main__ | Checking if model exists locally...
+2026-01-20 18:15:34,495 | INFO | __main__ | Model artifacts:
+2026-01-20 18:15:34,495 | INFO | __main__ | Model    : C:\Users\IU_Admin\Desktop\oil_analysis_anomaly_alert\models\23\model.pkl
+2026-01-20 18:15:34,495 | INFO | __main__ | Scaler   : C:\Users\IU_Admin\Desktop\oil_analysis_anomaly_alert\models\23\scaler.pkl
+2026-01-20 18:15:34,495 | INFO | __main__ | Metadata : C:\Users\IU_Admin\Desktop\oil_analysis_anomaly_alert\models\23\metadata.json
+2026-01-20 18:15:34,495 | ERROR | __main__ | ❌ Missing model artifacts:
+2026-01-20 18:15:34,495 | ERROR | __main__ |  - C:\Users\IU_Admin\Desktop\oil_analysis_anomaly_alert\models\23\model.pkl
+2026-01-20 18:15:34,495 | ERROR | __main__ |  - C:\Users\IU_Admin\Desktop\oil_analysis_anomaly_alert\models\23\scaler.pkl
+2026-01-20 18:15:34,495 | ERROR | __main__ |  - C:\Users\IU_Admin\Desktop\oil_analysis_anomaly_alert\models\23\metadata.json
+2026-01-20 18:20:48,881 | INFO | __main__ | ========== MODEL BUILDER LOCAL VALIDATION ==========
+2026-01-20 18:20:48,881 | INFO | __main__ | Device ID   : AA:BB:CC:XX:YY:13
+2026-01-20 18:20:48,881 | INFO | __main__ | Train Start : 2026-01-06T00:00:00.000Z
+2026-01-20 18:20:48,881 | INFO | __main__ | Train End   : 2026-01-08T00:00:00.000Z
+2026-01-20 18:20:48,881 | INFO | __main__ | Model Base  : C:\Users\IU_Admin\Desktop\oil_analysis_anomaly_alert\models
+2026-01-20 18:20:48,881 | INFO | __main__ | ===================================================
+2026-01-20 18:20:48,881 | INFO | __main__ | Starting model training via model_builder...
+2026-01-20 18:22:21,658 | INFO | __main__ | Checking if model exists locally...
+2026-01-20 18:22:21,713 | INFO | __main__ | Model artifacts:
+2026-01-20 18:22:21,714 | INFO | __main__ | Model    : C:\Users\IU_Admin\Desktop\oil_analysis_anomaly_alert\models\23\model.pkl
+2026-01-20 18:22:21,715 | INFO | __main__ | Scaler   : C:\Users\IU_Admin\Desktop\oil_analysis_anomaly_alert\models\23\scaler.pkl
+2026-01-20 18:22:21,716 | INFO | __main__ | Metadata : C:\Users\IU_Admin\Desktop\oil_analysis_anomaly_alert\models\23\metadata.json
+2026-01-20 18:22:21,717 | ERROR | __main__ | ❌ Missing model artifacts:
+2026-01-20 18:22:21,717 | ERROR | __main__ |  - C:\Users\IU_Admin\Desktop\oil_analysis_anomaly_alert\models\23\model.pkl
+2026-01-20 18:22:21,717 | ERROR | __main__ |  - C:\Users\IU_Admin\Desktop\oil_analysis_anomaly_alert\models\23\scaler.pkl
+2026-01-20 18:22:21,717 | ERROR | __main__ |  - C:\Users\IU_Admin\Desktop\oil_analysis_anomaly_alert\models\23\metadata.json
+2026-01-20 18:25:09,511 | INFO | __main__ | ========== FINAL MODEL BUILDER SANITY CHECK ==========
+2026-01-20 18:25:09,511 | INFO | __main__ | Device ID        : AA:BB:CC:XX:YY:13
+2026-01-20 18:25:09,511 | INFO | __main__ | Train Start Time : 2026-01-06T00:00:00.000Z
+2026-01-20 18:25:09,511 | INFO | __main__ | Train End Time   : 2026-01-08T00:00:00.000Z
+2026-01-20 18:25:09,511 | INFO | __main__ | Model Base Dir   : C:\Users\IU_Admin\Desktop\oil_analysis_anomaly_alert\models
+2026-01-20 18:25:09,514 | INFO | __main__ | =====================================================
+2026-01-20 18:26:42,380 | INFO | __main__ | ✔ Training function completed
+2026-01-20 18:26:42,383 | INFO | __main__ | MODEL_PATH → C:\Users\IU_Admin\Desktop\oil_analysis_anomaly_alert\models\23\model.pkl
+2026-01-20 18:26:42,384 | INFO | __main__ | SCALER_PATH → C:\Users\IU_Admin\Desktop\oil_analysis_anomaly_alert\models\23\scaler.pkl
+2026-01-20 18:26:42,385 | INFO | __main__ | METADATA_PATH → C:\Users\IU_Admin\Desktop\oil_analysis_anomaly_alert\models\23\metadata.json
+2026-01-20 18:26:42,387 | ERROR | __main__ | ❌ MODEL FILES MISSING
+2026-01-20 18:26:42,388 | ERROR | __main__ |  - C:\Users\IU_Admin\Desktop\oil_analysis_anomaly_alert\models\23\model.pkl
+2026-01-20 18:26:42,393 | ERROR | __main__ |  - C:\Users\IU_Admin\Desktop\oil_analysis_anomaly_alert\models\23\scaler.pkl
+2026-01-20 18:26:42,394 | ERROR | __main__ |  - C:\Users\IU_Admin\Desktop\oil_analysis_anomaly_alert\models\23\metadata.json
+2026-01-20 18:31:32,704 | INFO | __main__ | ========== FINAL MODEL BUILDER SANITY CHECK ==========
+2026-01-20 18:31:32,704 | INFO | __main__ | Device ID        : AA:BB:CC:XX:YY:13
+2026-01-20 18:31:32,704 | INFO | __main__ | Train Start Time : 2026-01-06T00:00:00.000Z
+2026-01-20 18:31:32,704 | INFO | __main__ | Train End Time   : 2026-01-08T00:00:00.000Z
+2026-01-20 18:31:32,704 | INFO | __main__ | Model Base Dir   : C:\Users\IU_Admin\Desktop\oil_analysis_anomaly_alert\local_model
+2026-01-20 18:31:32,704 | INFO | __main__ | =====================================================
+2026-01-20 18:33:00,482 | INFO | __main__ | ✔ Training function completed
+2026-01-20 18:33:00,483 | INFO | __main__ | MODEL_PATH → C:\Users\IU_Admin\Desktop\oil_analysis_anomaly_alert\local_model\23\model.pkl
+2026-01-20 18:33:00,484 | INFO | __main__ | SCALER_PATH → C:\Users\IU_Admin\Desktop\oil_analysis_anomaly_alert\local_model\23\scaler.pkl
+2026-01-20 18:33:00,485 | INFO | __main__ | METADATA_PATH → C:\Users\IU_Admin\Desktop\oil_analysis_anomaly_alert\local_model\23\metadata.json
+2026-01-20 18:33:00,485 | ERROR | __main__ | ❌ MODEL FILES MISSING
+2026-01-20 18:33:00,485 | ERROR | __main__ |  - C:\Users\IU_Admin\Desktop\oil_analysis_anomaly_alert\local_model\23\model.pkl
+2026-01-20 18:33:00,485 | ERROR | __main__ |  - C:\Users\IU_Admin\Desktop\oil_analysis_anomaly_alert\local_model\23\scaler.pkl
+2026-01-20 18:33:00,488 | ERROR | __main__ |  - C:\Users\IU_Admin\Desktop\oil_analysis_anomaly_alert\local_model\23\metadata.json
+2026-01-20 18:34:29,024 | INFO | __main__ | ========== FINAL MODEL BUILDER SANITY CHECK ==========
+2026-01-20 18:34:29,025 | INFO | __main__ | Device ID        : AA:BB:CC:XX:YY:13
+2026-01-20 18:34:29,025 | INFO | __main__ | Train Start Time : 2026-01-06T00:00:00.000Z
+2026-01-20 18:34:29,025 | INFO | __main__ | Train End Time   : 2026-01-08T00:00:00.000Z
+2026-01-20 18:34:29,025 | INFO | __main__ | Model Base Dir   : C:\Users\IU_Admin\Desktop\oil_analysis_anomaly_alert\local_model
+2026-01-20 18:34:29,026 | INFO | __main__ | =====================================================
+2026-01-20 18:35:55,973 | INFO | __main__ | ✔ Training function completed
+2026-01-20 18:35:55,973 | INFO | __main__ | MODEL_PATH → C:\Users\IU_Admin\Desktop\oil_analysis_anomaly_alert\local_model\23\model.pkl
+2026-01-20 18:35:55,973 | INFO | __main__ | SCALER_PATH → C:\Users\IU_Admin\Desktop\oil_analysis_anomaly_alert\local_model\23\scaler.pkl
+2026-01-20 18:35:55,973 | INFO | __main__ | METADATA_PATH → C:\Users\IU_Admin\Desktop\oil_analysis_anomaly_alert\local_model\23\metadata.json
+2026-01-20 18:35:55,973 | ERROR | __main__ | ❌ MODEL FILES MISSING
+2026-01-20 18:35:55,973 | ERROR | __main__ |  - C:\Users\IU_Admin\Desktop\oil_analysis_anomaly_alert\local_model\23\model.pkl
+2026-01-20 18:35:55,979 | ERROR | __main__ |  - C:\Users\IU_Admin\Desktop\oil_analysis_anomaly_alert\local_model\23\scaler.pkl
+2026-01-20 18:35:55,979 | ERROR | __main__ |  - C:\Users\IU_Admin\Desktop\oil_analysis_anomaly_alert\local_model\23\metadata.json

@@ -8,7 +8,5 @@ __pycache__/
 *.local
 *.secret
 test_*.py
-demo_models/
-local_models/
-demo_train_and_predict_from_api.py
+final_model_builder_sanity_check.py
 
