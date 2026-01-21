@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 from typing import Dict, Any
+from datetime import datetime, timedelta, timezone
 
 import pandas as pd
 from pyflink.datastream.functions import FlatMapFunction, RuntimeContext
@@ -79,7 +80,6 @@ class MultiModelAnomalyOperator(FlatMapFunction):
             pass
 
         elif state in ("IN_PROGRESS", "FAILED"):
-            # Do not retry training
             return
 
         elif state == "NOT_STARTED":
@@ -98,11 +98,15 @@ class MultiModelAnomalyOperator(FlatMapFunction):
                 )
 
                 try:
+                    end_time = datetime.now(timezone.utc)
+                    start_time = end_time - timedelta(days=30)
+
                     build_model_for_device_v2(
                         device_id=device_id,
-                        start_datetime=CONFIG.TRAIN_START_TIME,
-                        end_datetime=CONFIG.TRAIN_END_TIME,
+                        start_datetime=start_time.isoformat().replace("+00:00", "Z"),
+                        end_datetime=end_time.isoformat().replace("+00:00", "Z"),
                     )
+
                 except Exception as exc:
                     self.training_state[monitor_id] = "FAILED"
                     logger.error(
