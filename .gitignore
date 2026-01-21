@@ -8,6 +8,8 @@ __pycache__/
 *.local
 *.secret
 test_*.py
-final_end_to_end_model_validation.py
+delete_models_by_monitor.py
+final.py
+production_reality_check.py
 
 

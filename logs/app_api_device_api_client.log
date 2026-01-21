@@ -27,3 +27,8 @@
 2026-01-19 13:21:36,052 | INFO | app.api.device_api_client | Resolved device → monitor | DEVICEID=AA:BB:CC:XX:YY:13 | MONITORID=23
 2026-01-19 13:34:46,719 | INFO | app.api.device_api_client | Resolved device → monitor | DEVICEID=AA:BB:CC:XX:YY:13 | MONITORID=23
 2026-01-19 14:07:30,666 | INFO | app.api.device_api_client | Resolved device → monitor | DEVICEID=AA:BB:CC:XX:YY:13 | MONITORID=23
+2026-01-21 20:05:54,441 | INFO | app.api.device_api_client | Resolved device → monitor | DEVICEID=90:15:06:52:76:CC | MONITORID=36
+2026-01-21 20:06:33,127 | INFO | app.api.device_api_client | Resolved device → monitor | DEVICEID=90:15:06:52:79:4C | MONITORID=38
+2026-01-21 20:31:22,469 | INFO | app.api.device_api_client | Resolved device → monitor | DEVICEID=90:15:06:52:79:4C | MONITORID=38
+2026-01-21 20:38:05,864 | INFO | app.api.device_api_client | Resolved device → monitor | DEVICEID=90:15:06:52:79:4C | MONITORID=38
+2026-01-21 20:38:48,724 | INFO | app.api.device_api_client | Resolved device → monitor | DEVICEID=90:15:06:52:78:28 | MONITORID=40

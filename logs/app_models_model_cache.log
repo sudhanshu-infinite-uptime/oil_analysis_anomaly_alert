@@ -1,0 +1,16 @@
+2026-01-21 18:54:53,410 | INFO | app.models.model_cache | ModelCache initialized | max_size=32 | instance=0x1edf6f52f80
+2026-01-21 18:54:53,428 | INFO | app.models.model_cache | ModelCache MISS | MONITORID=36 | loading from S3
+2026-01-21 19:32:18,382 | INFO | app.models.model_cache | ModelCache initialized | max_size=32 | instance=0x1341e7b6590
+2026-01-21 19:32:18,389 | INFO | app.models.model_cache | ModelCache MISS | MONITORID=36 | loading from S3
+2026-01-21 19:44:46,892 | INFO | app.models.model_cache | ModelCache initialized | max_size=32 | instance=0x1bc171d3760
+2026-01-21 19:44:46,892 | INFO | app.models.model_cache | ModelCache MISS | MONITORID=32 | loading from S3
+2026-01-21 20:05:55,693 | INFO | app.models.model_cache | ModelCache initialized | max_size=32 | instance=0x1db941ade70
+2026-01-21 20:05:55,693 | INFO | app.models.model_cache | ModelCache MISS | MONITORID=36 | loading from S3
+2026-01-21 20:07:03,396 | INFO | app.models.model_cache | ModelCache initialized | max_size=32 | instance=0x2827c8fde70
+2026-01-21 20:07:03,396 | INFO | app.models.model_cache | ModelCache MISS | MONITORID=38 | loading from S3
+2026-01-21 20:31:23,350 | INFO | app.models.model_cache | ModelCache initialized | max_size=32 | instance=0x2ae1cd7de70
+2026-01-21 20:31:23,352 | INFO | app.models.model_cache | ModelCache MISS | MONITORID=38 | loading from S3
+2026-01-21 20:38:06,662 | INFO | app.models.model_cache | ModelCache initialized | max_size=32 | instance=0x1e458d9de70
+2026-01-21 20:38:06,663 | INFO | app.models.model_cache | ModelCache MISS | MONITORID=38 | loading from S3
+2026-01-21 20:41:40,812 | INFO | app.models.model_cache | ModelCache initialized | max_size=32 | instance=0x2067f90de70
+2026-01-21 20:41:40,817 | INFO | app.models.model_cache | ModelCache MISS | MONITORID=40 | loading from S3

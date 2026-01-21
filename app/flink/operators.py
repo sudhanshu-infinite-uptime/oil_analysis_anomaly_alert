@@ -22,33 +22,24 @@ logger = get_logger(__name__)
 
 class MultiModelAnomalyOperator(FlatMapFunction):
     """
-    Flink operator for multi-monitor anomaly detection.
+    FINAL, IMMUTABLE MODEL BEHAVIOR
 
-    Responsibilities:
-    - Resolve DEVICEID → MONITORID (runtime)
-    - Train model ONCE per monitor (Trend API v2)
-    - Maintain per-monitor sliding windows
-    - Run anomaly detection
-    - Emit alerts
+    • One model per monitor
+    • Never retrain existing models
+    • Never replace models
+    • Train once, then always infer
     """
 
-    # ------------------------------------------------------------------
-    # Lifecycle
-    # ------------------------------------------------------------------
     def open(self, runtime_context: RuntimeContext):
         logger.info("Initializing MultiModelAnomalyOperator")
 
         self.device_client = DeviceAPIClient()
         self.model_cache = ModelCache(max_size=CONFIG.MODEL_CACHE_SIZE)
 
-        # Per-monitor runtime state
         self.windows: Dict[int, SlidingWindow] = {}
         self.training_state: Dict[int, str] = {}
-        # States: NOT_STARTED | IN_PROGRESS | READY | FAILED
+        # States: NOT_STARTED | READY | FAILED
 
-    # ------------------------------------------------------------------
-    # Main processing
-    # ------------------------------------------------------------------
     def flat_map(self, value: str):
         record = safe_json_parse(value)
         if not record:
@@ -58,11 +49,8 @@ class MultiModelAnomalyOperator(FlatMapFunction):
         if not device_id:
             return
 
-        # ------------------------------------------------------------
-        # Resolve device → monitor
-        # ------------------------------------------------------------
         try:
-            monitor_id = self.device_client.get_monitor_id_runtime(device_id)
+            runtime_monitor_id = self.device_client.get_monitor_id_runtime(device_id)
         except Exception as exc:
             logger.error(
                 "Device resolution failed | DEVICEID=%s | %s",
@@ -71,30 +59,35 @@ class MultiModelAnomalyOperator(FlatMapFunction):
             )
             return
 
-        # ------------------------------------------------------------
-        # Training state machine (ONCE per monitor)
-        # ------------------------------------------------------------
-        state = self.training_state.get(monitor_id, "NOT_STARTED")
+        state = self.training_state.get(runtime_monitor_id, "NOT_STARTED")
 
-        if state == "READY":
-            pass
+        # --------------------------------------------------
+        # ENSURE MODEL EXISTS (ONCE)
+        # --------------------------------------------------
+        if state == "NOT_STARTED":
 
-        elif state in ("IN_PROGRESS", "FAILED"):
-            return
+            if model_exists(str(runtime_monitor_id)):
+                # Validate by loading once
+                try:
+                    self.model_cache.get(runtime_monitor_id)
+                    self.training_state[runtime_monitor_id] = "READY"
+                    logger.info(
+                        "Using existing model | MONITORID=%s",
+                        runtime_monitor_id,
+                    )
+                except Exception as exc:
+                    self.training_state[runtime_monitor_id] = "FAILED"
+                    logger.error(
+                        "Existing model failed to load | MONITORID=%s | %s",
+                        runtime_monitor_id,
+                        exc,
+                    )
+                    return
 
-        elif state == "NOT_STARTED":
-            if model_exists(monitor_id):
-                self.training_state[monitor_id] = "READY"
-                logger.info(
-                    "Model already exists | MONITORID=%s",
-                    monitor_id,
-                )
             else:
-                self.training_state[monitor_id] = "IN_PROGRESS"
                 logger.info(
-                    "Model missing → training ONCE | DEVICEID=%s | MONITORID=%s",
+                    "No model found → training ONCE | DEVICEID=%s",
                     device_id,
-                    monitor_id,
                 )
 
                 try:
@@ -108,81 +101,81 @@ class MultiModelAnomalyOperator(FlatMapFunction):
                     )
 
                 except Exception as exc:
-                    self.training_state[monitor_id] = "FAILED"
+                    self.training_state[runtime_monitor_id] = "FAILED"
                     logger.error(
-                        "Model training failed permanently | MONITORID=%s | %s",
-                        monitor_id,
+                        "Model training failed | DEVICEID=%s | %s",
+                        device_id,
                         exc,
                     )
                     return
 
-                if model_exists(monitor_id):
-                    self.training_state[monitor_id] = "READY"
+                # Re-validate via cache load
+                try:
+                    self.model_cache.get(runtime_monitor_id)
+                    self.training_state[runtime_monitor_id] = "READY"
                     logger.info(
-                        "Model training successful | MONITORID=%s",
-                        monitor_id,
+                        "Model ready for inference | MONITORID=%s",
+                        runtime_monitor_id,
                     )
-                else:
-                    self.training_state[monitor_id] = "FAILED"
+                except Exception as exc:
+                    self.training_state[runtime_monitor_id] = "FAILED"
                     logger.error(
-                        "Training completed but model missing | MONITORID=%s",
-                        monitor_id,
+                        "Training completed but model load failed | MONITORID=%s | %s",
+                        runtime_monitor_id,
+                        exc,
                     )
                     return
 
-        # ------------------------------------------------------------
-        # Sliding window setup
-        # ------------------------------------------------------------
-        if monitor_id not in self.windows:
-            self.windows[monitor_id] = SlidingWindow(
+        if self.training_state.get(runtime_monitor_id) != "READY":
+            logger.debug(
+                "Model not ready, skipping record | MONITORID=%s",
+                runtime_monitor_id,
+            )
+            return
+
+        # --------------------------------------------------
+        # SLIDING WINDOW
+        # --------------------------------------------------
+        if runtime_monitor_id not in self.windows:
+            self.windows[runtime_monitor_id] = SlidingWindow(
                 window_size=CONFIG.WINDOW_COUNT,
                 slide_size=CONFIG.SLIDE_COUNT,
             )
 
-        window = self.windows[monitor_id]
+        window = self.windows[runtime_monitor_id]
         window.add(record)
 
         if not window.is_full():
             return
 
-        # ------------------------------------------------------------
-        # Load model bundle
-        # ------------------------------------------------------------
+        # --------------------------------------------------
+        # LOAD MODEL
+        # --------------------------------------------------
         try:
-            model, scaler, metadata = self.model_cache.get(monitor_id)
+            model, scaler, metadata = self.model_cache.get(runtime_monitor_id)
         except Exception as exc:
             logger.error(
                 "Model load failed | MONITORID=%s | %s",
-                monitor_id,
+                runtime_monitor_id,
                 exc,
             )
             window.slide()
             return
 
-        feature_names = metadata.get("feature_names")
-        if not feature_names:
-            logger.error(
-                "Invalid model metadata | MONITORID=%s",
-                monitor_id,
-            )
-            window.slide()
-            return
+        df = self._align_features(
+            window.to_dataframe(),
+            metadata["feature_names"],
+        )
 
-        # ------------------------------------------------------------
-        # Prepare data
-        # ------------------------------------------------------------
-        df = window.to_dataframe()
-        df = self._align_features(df, feature_names)
-
-        # ------------------------------------------------------------
-        # Inference
-        # ------------------------------------------------------------
+        # --------------------------------------------------
+        # INFERENCE
+        # --------------------------------------------------
         try:
             result = detect_anomalies(df, model, scaler, metadata)
         except Exception as exc:
             logger.error(
                 "Inference failed | MONITORID=%s | %s",
-                monitor_id,
+                runtime_monitor_id,
                 exc,
             )
             window.slide()
@@ -191,34 +184,18 @@ class MultiModelAnomalyOperator(FlatMapFunction):
         window.slide()
 
         if result.get("is_anomaly"):
-            logger.warning(
-                "Anomaly detected | MONITORID=%s",
-                monitor_id,
+            yield json.dumps(
+                {
+                    "monitorId": runtime_monitor_id,
+                    "isAnomaly": True,
+                    "indices": result.get("anomaly_indices", []),
+                    "modelMetadata": result.get("model_metadata", {}),
+                }
             )
-            yield json.dumps(self._format_alert(monitor_id, result))
 
-    # ------------------------------------------------------------------
-    # Helpers
-    # ------------------------------------------------------------------
-    def _align_features(
-        self,
-        df: pd.DataFrame,
-        feature_names: list,
-    ) -> pd.DataFrame:
+    def _align_features(self, df: pd.DataFrame, feature_names: list) -> pd.DataFrame:
         for col in feature_names:
             if col not in df.columns:
                 df[col] = 0.0
             df[col] = df[col].astype(float)
         return df[feature_names]
-
-    def _format_alert(
-        self,
-        monitor_id: int,
-        result: Dict[str, Any],
-    ) -> Dict[str, Any]:
-        return {
-            "monitorId": monitor_id,
-            "isAnomaly": True,
-            "indices": result.get("anomaly_indices", []),
-            "modelMetadata": result.get("model_metadata", {}),
-        }
