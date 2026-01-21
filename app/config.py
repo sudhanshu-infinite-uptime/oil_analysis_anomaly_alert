@@ -144,10 +144,6 @@ class Config:
     ANOMALY_CONTAMINATION: float
     MODEL_CACHE_SIZE: int
 
-    # Training window (auto-train on first event)
-    TRAIN_START_TIME: str
-    TRAIN_END_TIME: str
-
 
     # Trend / Device API
     TREND_API_BASE_URL: str
@@ -190,16 +186,6 @@ CONFIG = Config(
     MODEL_TREES=_env_int("MODEL_TREES", 200),
     ANOMALY_CONTAMINATION=_env_float("ANOMALY_CONTAMINATION", 0.05),
     MODEL_CACHE_SIZE=_env_int("MODEL_CACHE_SIZE", 32),
-
-    # Training window
-    TRAIN_START_TIME=_env_str(
-        "TRAIN_START_TIME",
-        "2025-11-29T10:05:00.000Z",
-    ),
-    TRAIN_END_TIME=_env_str(
-        "TRAIN_END_TIME",
-        "2025-12-29T10:05:00.000Z",
-    ),
 
     # Trend / Device API
     TREND_API_BASE_URL=_env_str(
@@ -250,12 +236,6 @@ if not CONFIG.TOKEN_PASSWORD:
 
 if not CONFIG.EXTERNAL_DEVICE_API_BASE_URL:
     _missing.append("EXTERNAL_DEVICE_API_BASE_URL")
-
-if not CONFIG.TRAIN_START_TIME:
-    _missing.append("TRAIN_START_TIME")
-
-if not CONFIG.TRAIN_END_TIME:
-    _missing.append("TRAIN_END_TIME")
 
 if _missing:
     raise RuntimeError(

@@ -3,6 +3,8 @@ from __future__ import annotations
 import pickle
 from datetime import datetime, timedelta
 from typing import Dict, Any, List
+from app.models.model_store import save_binary, save_metadata, mark_model_success
+
 
 import pandas as pd
 from sklearn.ensemble import IsolationForest
@@ -236,6 +238,8 @@ def _train_single_monitor_strict(
     # ------------------------------
     # Persist
     # ------------------------------
+    mark_model_success(str(monitor_id))
+    
     save_binary(f"{monitor_id}/model.pkl", pickle.dumps(model))
     save_binary(f"{monitor_id}/scaler.pkl", pickle.dumps(scaler))
     save_metadata(monitor_id, metadata)
