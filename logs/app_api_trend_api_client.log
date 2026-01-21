@@ -561,3 +561,4 @@
 2026-01-20 18:35:51,422 | INFO | app.api.trend_api_client | Trend API v2 success | MONITORID=23 | records=684
 2026-01-20 18:35:51,423 | INFO | app.api.trend_api_client | Fetching trend history (v2) | DEVICEID=AA:BB:CC:XX:YY:13 | window=2026-01-07T23:00:00Z → 2026-01-08T00:00:00Z
 2026-01-20 18:35:53,176 | INFO | app.api.trend_api_client | Trend API v2 success | MONITORID=23 | records=677
+2026-01-21 10:39:01,746 | INFO | app.api.trend_api_client | Fetching trend history (v2) | DEVICEID=AA:BB:CC:XX:YY:13 | window=2026-01-06T00:00:00.000Z → 2026-01-08T00:00:00.000Z
