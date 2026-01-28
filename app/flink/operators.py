@@ -92,7 +92,7 @@ class MultiModelAnomalyOperator(FlatMapFunction):
 
                 try:
                     end_time = datetime.now(timezone.utc)
-                    start_time = end_time - timedelta(days=30)
+                    start_time = end_time - timedelta(days=90)
 
                     build_model_for_device_v2(
                         device_id=device_id,

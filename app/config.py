@@ -184,7 +184,7 @@ CONFIG = Config(
 
     # Model
     MODEL_TREES=_env_int("MODEL_TREES", 200),
-    ANOMALY_CONTAMINATION=_env_float("ANOMALY_CONTAMINATION", 0.05),
+    ANOMALY_CONTAMINATION=_env_float("ANOMALY_CONTAMINATION", 0.0001),
     MODEL_CACHE_SIZE=_env_int("MODEL_CACHE_SIZE", 32),
 
     # Trend / Device API

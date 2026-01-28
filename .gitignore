@@ -11,5 +11,11 @@ test_*.py
 delete_models_by_monitor.py
 final.py
 production_reality_check.py
+trend_data_reality_check.py
+alert_clean.log
+alert_raw.log
+count_alerts_per_day.py
+flink_logs
+
 
 
