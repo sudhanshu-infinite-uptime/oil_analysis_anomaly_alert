@@ -2,7 +2,7 @@ version: "3.9"
 
 services:
   # ---------------------------------------------------------
-  # 🧠 Flink JobManager (AUTO-RUN PIPELINE)
+  #  Flink JobManager (AUTO-RUN PIPELINE)
   # ---------------------------------------------------------
   jobmanager:
     build:
@@ -146,8 +146,6 @@ networks:
 volumes:
   kafka_data:
   flink_logs:
-
-
 
 
 

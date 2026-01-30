@@ -18,3 +18,5 @@
 2026-01-28 18:07:11,765 | INFO | app.models.model_cache | ModelCache MISS | MONITORID=30 | loading from S3
 2026-01-28 18:18:01,138 | INFO | app.models.model_cache | ModelCache initialized | max_size=32 | instance=0x2365076de70
 2026-01-28 18:18:01,138 | INFO | app.models.model_cache | ModelCache MISS | MONITORID=38 | loading from S3
+2026-01-30 10:42:10,027 | INFO | app.models.model_cache | ModelCache initialized | max_size=32 | instance=0x250e1c5df60
+2026-01-30 10:42:10,028 | INFO | app.models.model_cache | ModelCache MISS | MONITORID=36 | loading from S3

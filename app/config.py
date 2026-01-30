@@ -180,10 +180,10 @@ CONFIG = Config(
 
     # Sliding window
     WINDOW_COUNT=_env_int("WINDOW_COUNT", 10),
-    SLIDE_COUNT=_env_int("SLIDE_COUNT", 3),
+    SLIDE_COUNT=_env_int("SLIDE_COUNT", 7),
 
     # Model
-    MODEL_TREES=_env_int("MODEL_TREES", 200),
+    MODEL_TREES=_env_int("MODEL_TREES", 100),
     ANOMALY_CONTAMINATION=_env_float("ANOMALY_CONTAMINATION", 0.0001),
     MODEL_CACHE_SIZE=_env_int("MODEL_CACHE_SIZE", 32),
 

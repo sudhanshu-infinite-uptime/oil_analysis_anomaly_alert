@@ -293,3 +293,5 @@
 2026-01-28 18:13:44,341 | INFO | app.api.token_manager | Access token generated successfully
 2026-01-28 18:13:45,343 | INFO | app.api.token_manager | Generating access token
 2026-01-28 18:13:45,489 | INFO | app.api.token_manager | Access token generated successfully
+2026-01-30 10:42:08,658 | INFO | app.api.token_manager | Generating access token
+2026-01-30 10:42:09,052 | INFO | app.api.token_manager | Access token generated successfully
