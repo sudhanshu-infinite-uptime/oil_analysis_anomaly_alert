@@ -35,3 +35,4 @@
 2026-01-28 18:07:10,986 | INFO | app.api.device_api_client | Resolved device → monitor | DEVICEID=90:15:06:52:83:E4 | MONITORID=30
 2026-01-28 18:13:44,668 | INFO | app.api.device_api_client | Resolved device → monitor | DEVICEID=90:15:06:52:79:4C | MONITORID=38
 2026-01-30 10:42:09,301 | INFO | app.api.device_api_client | Resolved device → monitor | DEVICEID=90:15:06:52:76:CC | MONITORID=36
+2026-02-01 18:38:29,413 | INFO | app.api.device_api_client | Resolved device → monitor | DEVICEID=10:06:1C:C2:5D:FC | MONITORID=29

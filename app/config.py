@@ -179,11 +179,11 @@ CONFIG = Config(
     KAFKA_GROUP=_env_str("KAFKA_GROUP", "oil-anomaly-consumer-group"),
 
     # Sliding window
-    WINDOW_COUNT=_env_int("WINDOW_COUNT", 10),
-    SLIDE_COUNT=_env_int("SLIDE_COUNT", 7),
+    WINDOW_COUNT=_env_int("WINDOW_COUNT", 20),
+    SLIDE_COUNT=_env_int("SLIDE_COUNT", 18),
 
     # Model
-    MODEL_TREES=_env_int("MODEL_TREES", 100),
+    MODEL_TREES=_env_int("MODEL_TREES", 300),
     ANOMALY_CONTAMINATION=_env_float("ANOMALY_CONTAMINATION", 0.0001),
     MODEL_CACHE_SIZE=_env_int("MODEL_CACHE_SIZE", 32),
 
